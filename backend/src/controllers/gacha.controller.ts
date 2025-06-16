@@ -3,6 +3,7 @@ import { GachaService } from "../services/gacha.service";
 import { CharacterService } from "../services/character.service";
 import { ItemService } from "../services/item.service";
 import { PetService } from "../services/pet.service";
+import { EquipmentService } from "../services/equipment.service";
 import {
   performSinglePull,
   performMultiPull,
@@ -21,6 +22,7 @@ const adaptGachaPoolForUtils = (mongoPool: IGachaPool): GachaPool => {
     characters: mongoPool.characters,
     pets: mongoPool.pets,
     items: mongoPool.items,
+    equipments: mongoPool.equipments || [],
     banners: mongoPool.banners.map(
       (banner: IBanner): Banner => ({
         id: banner.id,
@@ -141,10 +143,14 @@ export const pull = async ({
       throw new Error("Insufficient currency");
     }
 
-    const pityKey = banner.type === "standard" ? "standardPity" : "eventPity";
+    // Fix: Use banner.type for consistent pity key selection
+    const pityKey =
+      banner.type === "event" || banner.type === "limited"
+        ? "eventPity"
+        : "standardPity";
     const currentPity = currentUser.pity[pityKey];
 
-    console.log("Current pity:", currentPity);
+    console.log("Current pity:", currentPity, "for banner type:", banner.type);
 
     // Convert MongoDB types to gacha utils compatible types
     const gachaPool = adaptGachaPoolForUtils(mongoGachaPool);
@@ -181,14 +187,33 @@ export const pull = async ({
             await ItemService.addUserItem(userId, pull.item.id, 1, "gacha");
           } else if (itemType === "pet") {
             await PetService.createUserPet(userId, pull.item.id, "gacha");
+          } else if (itemType === "equipment") {
+            await EquipmentService.createUserEquipment(
+              userId,
+              pull.item.id,
+              "gacha"
+            );
           }
         })
       );
 
       // Check if any pull got SSR to reset pity
       const gotSSR = result.pulls.some((pull) => pull.item.rarity === "SSR");
-      const pityType = bannerId.includes("event") ? "event" : "standard";
+      const pityType =
+        banner.type === "event" || banner.type === "limited"
+          ? "event"
+          : "standard";
       const newPity = gotSSR ? 0 : currentPity + 10;
+
+      console.log("Multi-pull pity update:", {
+        bannerId,
+        bannerType: banner.type,
+        pityType,
+        currentPity,
+        newPity,
+        gotSSR,
+        ssrCount: result.pulls.filter((p) => p.item.rarity === "SSR").length,
+      });
 
       await UserService.updateUserPity(userId, pityType, newPity, 10);
 
@@ -236,11 +261,25 @@ export const pull = async ({
         await ItemService.addUserItem(userId, result.id, 1, "gacha");
       } else if (itemType === "pet") {
         await PetService.createUserPet(userId, result.id, "gacha");
+      } else if (itemType === "equipment") {
+        await EquipmentService.createUserEquipment(userId, result.id, "gacha");
       }
 
       // Update user pity
-      const pityType = bannerId.includes("event") ? "event" : "standard";
+      const pityType =
+        banner.type === "event" || banner.type === "limited"
+          ? "event"
+          : "standard";
       const newPity = result.rarity === "SSR" ? 0 : currentPity + 1;
+
+      console.log("Single-pull pity update:", {
+        bannerId,
+        bannerType: banner.type,
+        pityType,
+        currentPity,
+        newPity,
+        gotSSR: result.rarity === "SSR",
+      });
 
       await UserService.updateUserPity(userId, pityType, newPity, 1);
 

@@ -5,6 +5,10 @@ import type {
   GachaPullResponse,
   InventoryResponse,
   UserProfile,
+  InventoryGridResponse,
+  CharacterDetailResponse,
+  PetDetailResponse,
+  ItemDetailResponse,
 } from "../types/types";
 import { API_ENDPOINTS } from "../constants/api";
 
@@ -13,6 +17,7 @@ async function apiRequest<T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> {
+  console.log("🌐 API Request:", { url, options });
   try {
     const response = await fetch(url, {
       headers: {
@@ -22,7 +27,9 @@ async function apiRequest<T>(
       ...options,
     });
 
+    console.log("🌐 API Response status:", response.status);
     const data = await response.json();
+    console.log("🌐 API Response data:", data);
 
     if (!response.ok) {
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
@@ -30,7 +37,7 @@ async function apiRequest<T>(
 
     return data;
   } catch (error) {
-    console.error("API request failed:", error);
+    console.error("🌐 API request failed:", error);
     throw error;
   }
 }
@@ -160,9 +167,8 @@ export const gameAPI = {
 
 // Inventory API services
 export const inventoryAPI = {
-  // Get full inventory
-  getInventory: async (token: string): Promise<InventoryResponse> => {
-    return apiRequest<InventoryResponse>(API_ENDPOINTS.INVENTORY.BASE, {
+  getUserInventory: async (token: string): Promise<any> => {
+    return apiRequest<any>(API_ENDPOINTS.GAME.INVENTORY, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -170,9 +176,8 @@ export const inventoryAPI = {
     });
   },
 
-  // Get characters
   getCharacters: async (token: string): Promise<any> => {
-    return apiRequest<any>(API_ENDPOINTS.INVENTORY.CHARACTERS, {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/characters`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -180,9 +185,32 @@ export const inventoryAPI = {
     });
   },
 
-  // Get pets
+  getCharactersGrid: async (token: string): Promise<any> => {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/grid/characters`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getCharacterDetail: async (
+    token: string,
+    characterId: string
+  ): Promise<any> => {
+    return apiRequest<any>(
+      `${API_ENDPOINTS.GAME.INVENTORY}/character/${characterId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+
   getPets: async (token: string): Promise<any> => {
-    return apiRequest<any>(API_ENDPOINTS.INVENTORY.PETS, {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/pets`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -190,14 +218,72 @@ export const inventoryAPI = {
     });
   },
 
-  // Get items
   getItems: async (token: string): Promise<any> => {
-    return apiRequest<any>(API_ENDPOINTS.INVENTORY.ITEMS, {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/items`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+  },
+
+  // NEW: Grid View APIs (Compact Data)
+  getInventoryGrid: async (token: string): Promise<InventoryGridResponse> => {
+    return apiRequest<InventoryGridResponse>(API_ENDPOINTS.INVENTORY.GRID, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getPetsGrid: async (token: string): Promise<any> => {
+    return apiRequest<any>(API_ENDPOINTS.INVENTORY.GRID_PETS, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getItemsGrid: async (token: string): Promise<any> => {
+    return apiRequest<any>(API_ENDPOINTS.INVENTORY.GRID_ITEMS, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  // NEW: Detail View APIs (Full Data)
+  getPetDetail: async (
+    token: string,
+    petId: string
+  ): Promise<PetDetailResponse> => {
+    return apiRequest<PetDetailResponse>(
+      `${API_ENDPOINTS.INVENTORY.PET_DETAIL}/${petId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+
+  getItemDetail: async (
+    token: string,
+    itemId: string
+  ): Promise<ItemDetailResponse> => {
+    return apiRequest<ItemDetailResponse>(
+      `${API_ENDPOINTS.INVENTORY.ITEM_DETAIL}/${itemId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
   },
 };
 

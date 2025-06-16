@@ -15,4 +15,28 @@ export const inventoryRoutes = new Elysia({ prefix: "/inventory" })
   })
   .get("/items", async ({ user }) => {
     return InventoryController.getItems({ user });
+  })
+  .get("/grid", async ({ user }) => {
+    return InventoryController.getInventoryGrid({ user });
+  })
+  .get("/grid/characters", async ({ user }) => {
+    return InventoryController.getCharactersGrid({ user });
+  })
+  .get("/grid/pets", async ({ user }) => {
+    return InventoryController.getPetsGrid({ user });
+  })
+  .get("/grid/items", async ({ user }) => {
+    return InventoryController.getItemsGrid({ user });
+  })
+  .get("/character/:id", async ({ user, params }) => {
+    return InventoryController.getCharacterDetail({
+      user,
+      characterId: params.id,
+    });
+  })
+  .get("/pet/:id", async ({ user, params }) => {
+    return InventoryController.getPetDetail({ user, petId: params.id });
+  })
+  .get("/item/:id", async ({ user, params }) => {
+    return InventoryController.getItemDetail({ user, itemId: params.id });
   });

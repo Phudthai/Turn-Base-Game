@@ -6,7 +6,7 @@ export interface ICharacter extends Document {
   id: string; // unique character ID
   name: string;
   rarity: "R" | "SR" | "SSR";
-  element: "fire" | "water" | "earth" | "air" | "light" | "dark";
+  element: "fire" | "water" | "earth" | "air" | "light" | "dark" | "neutral";
   characterType: "warrior" | "mage" | "archer" | "healer" | "tank";
   baseStats: {
     hp: number;
@@ -51,7 +51,7 @@ const CharacterSchema = new Schema<ICharacter>(
     rarity: { type: String, enum: ["R", "SR", "SSR"], required: true },
     element: {
       type: String,
-      enum: ["fire", "water", "earth", "air", "light", "dark"],
+      enum: ["fire", "water", "earth", "air", "light", "dark", "neutral"],
       required: true,
     },
     characterType: {
@@ -110,4 +110,3 @@ export const Character = mongoose.model<ICharacter>(
   "Character",
   CharacterSchema
 );
- 

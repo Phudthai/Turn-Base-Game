@@ -8,8 +8,8 @@ export const battleRoutes = new Elysia({ prefix: "/battle" })
   .use(authMiddleware)
   .post(
     "/start",
-    async ({ body }) => {
-      return BattleController.startBattle({ body });
+    async ({ body, user }) => {
+      return BattleController.startBattle({ body, user });
     },
     {
       body: t.Object({

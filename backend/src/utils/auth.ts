@@ -1,18 +1,21 @@
 import { SignJWT, jwtVerify } from "jose";
 import { ENV } from "../config/env";
-import type { User } from "../models/user.model";
 
-export const generateToken = async (payload: Omit<User, "password">) => {
+export const generateToken = async (payload: {
+  id: string;
+  username: string;
+  level?: number;
+  experience?: number;
+  currency?: any;
+}) => {
   const secret = new TextEncoder().encode(ENV.JWT_SECRET);
   return await new SignJWT({
-    ...payload,
-    // Add any additional claims here
-    iss: "idle-picoen",
-    aud: "game-client",
+    id: payload.id,
+    username: payload.username,
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // 7 days
   })
     .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("24h")
     .sign(secret);
 };
 

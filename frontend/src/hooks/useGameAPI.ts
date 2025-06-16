@@ -20,16 +20,25 @@ export const useGameAPI = () => {
         return null;
       }
 
+      console.log("🎰 Starting single gacha pull...");
       setIsLoading(true);
       setError(null);
       try {
+        console.log("🎰 Calling gameAPI.performGacha...");
         const result = await gameAPI.performGacha(token, bannerId);
+        console.log("🎰 Gacha result received:", result);
+
+        console.log("🎰 Refreshing profile...");
         await refreshProfile(); // Update currency after gacha
+        console.log("🎰 Profile refreshed successfully");
+
         return result;
       } catch (err: any) {
+        console.error("🎰 Gacha error:", err);
         setError(err.message || "Failed to perform gacha");
         return null;
       } finally {
+        console.log("🎰 Setting loading to false");
         setIsLoading(false);
       }
     },
@@ -45,16 +54,25 @@ export const useGameAPI = () => {
         return null;
       }
 
+      console.log("🎰 Starting multi gacha pull...");
       setIsLoading(true);
       setError(null);
       try {
+        console.log("🎰 Calling gameAPI.performMultiGacha...");
         const result = await gameAPI.performMultiGacha(token, bannerId);
+        console.log("🎰 Multi gacha result received:", result);
+
+        console.log("🎰 Refreshing profile...");
         await refreshProfile(); // Update currency after gacha
+        console.log("🎰 Profile refreshed successfully");
+
         return result;
       } catch (err: any) {
+        console.error("🎰 Multi gacha error:", err);
         setError(err.message || "Failed to perform multi gacha");
         return null;
       } finally {
+        console.log("🎰 Setting loading to false");
         setIsLoading(false);
       }
     },

@@ -6,44 +6,129 @@ import {
   BattleResult,
   StatusEffect,
 } from "../types/battle.types";
-import { mockCharacters } from "../data/mock/characters.mock";
+import { CharacterService } from "./character.service";
+import { Character } from "../models/character.model";
 
 // In-memory store for active battles
 const activeBattles = new Map<string, BattleState>();
 
 export class BattleService {
   static async createBattle(
+    userId: string,
     playerCharacterIds: string[]
   ): Promise<BattleState> {
-    // Get player characters from mock data
-    const playerCharacters = mockCharacters.filter(
-      (char) => char.isPlayer && playerCharacterIds.includes(char.id)
-    );
+    try {
+      // Get user characters from database
+      const userCharacters = await CharacterService.getUserCharacters(userId);
+      const characterTemplates = await Character.find({});
 
-    // Get random enemy for now
-    const enemies = mockCharacters.filter((char) => !char.isPlayer);
+      // Filter user characters that match the requested IDs (use _id for matching)
+      const selectedUserChars = userCharacters.filter((char) =>
+        playerCharacterIds.includes(char._id.toString())
+      );
 
-    if (playerCharacters.length === 0) {
-      throw new Error("No valid player characters selected");
+      if (selectedUserChars.length === 0) {
+        throw new Error("No valid player characters selected");
+      }
+
+      // Convert user characters to battle characters
+      const playerCharacters: BattleCharacter[] = selectedUserChars.map(
+        (userChar, index) => {
+          const template = characterTemplates.find(
+            (t) => t.id === userChar.characterId
+          );
+
+          return {
+            id: userChar._id.toString(),
+            name: template?.name || userChar.characterId,
+            level: userChar.level,
+            stats: {
+              hp: userChar.currentStats.hp,
+              maxHp: userChar.currentStats.hp,
+              attack: userChar.currentStats.attack,
+              defense: userChar.currentStats.defense,
+              speed: userChar.currentStats.speed,
+              critRate: userChar.currentStats.critRate,
+              critDamage: userChar.currentStats.critDamage,
+            },
+            skills:
+              template?.skills.map((skill) => ({
+                id: skill.id,
+                name: skill.name,
+                description: skill.description,
+                damage: 100 + userChar.level * 10, // Scale with level
+                energyCost: skill.manaCost || 20,
+                cooldown: skill.cooldown || 3,
+                targeting: "single" as const,
+              })) || [],
+            statusEffects: [],
+            currentEnergy: 100,
+            maxEnergy: 100,
+            position: index + 1,
+            isPlayer: true,
+          };
+        }
+      );
+
+      // Create simple enemy
+      const enemy: BattleCharacter = {
+        id: "enemy_goblin",
+        name: "Goblin Warrior",
+        level: Math.max(
+          1,
+          Math.floor(
+            playerCharacters.reduce((sum, char) => sum + char.level, 0) /
+              playerCharacters.length
+          )
+        ),
+        stats: {
+          hp: 150 + (playerCharacters[0]?.level || 1) * 20,
+          maxHp: 150 + (playerCharacters[0]?.level || 1) * 20,
+          attack: 80 + (playerCharacters[0]?.level || 1) * 5,
+          defense: 40 + (playerCharacters[0]?.level || 1) * 3,
+          speed: 70,
+          critRate: 10,
+          critDamage: 130,
+        },
+        skills: [
+          {
+            id: "goblin_slash",
+            name: "Slash",
+            description: "Basic sword attack",
+            damage: 80,
+            energyCost: 15,
+            cooldown: 2,
+            targeting: "single",
+          },
+        ],
+        statusEffects: [],
+        currentEnergy: 100,
+        maxEnergy: 100,
+        position: 1,
+        isPlayer: false,
+      };
+
+      const battleState: BattleState = {
+        id: nanoid(),
+        characters: [...playerCharacters, enemy],
+        currentTurn: 0,
+        turnOrder: [],
+        status: "waiting",
+        log: ["Battle started"],
+      };
+
+      // Calculate initial turn order
+      battleState.turnOrder = this.calculateTurnOrder(battleState.characters);
+      battleState.status = "in_progress";
+
+      // Store battle state
+      activeBattles.set(battleState.id, battleState);
+
+      return battleState;
+    } catch (error) {
+      console.error("Error creating battle:", error);
+      throw error;
     }
-
-    const battleState: BattleState = {
-      id: nanoid(),
-      characters: [...playerCharacters, ...enemies],
-      currentTurn: 0,
-      turnOrder: [],
-      status: "waiting",
-      log: ["Battle started"],
-    };
-
-    // Calculate initial turn order
-    battleState.turnOrder = this.calculateTurnOrder(battleState.characters);
-    battleState.status = "in_progress";
-
-    // Store battle state
-    activeBattles.set(battleState.id, battleState);
-
-    return battleState;
   }
 
   static async getBattleState(battleId: string): Promise<BattleState> {

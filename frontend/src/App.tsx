@@ -45,8 +45,18 @@ function AppContent() {
   const [gameState, setGameState] = useState<GameState>("dashboard");
   const { user, isLoading, error, clearError, logout } = useAuth();
 
+  console.log(
+    "🎮 App render - isLoading:",
+    isLoading,
+    "user:",
+    !!user,
+    "gameState:",
+    gameState
+  );
+
   // Show loading screen while initializing
   if (isLoading) {
+    console.log("🎮 Showing loading screen");
     return <LoadingScreen />;
   }
 

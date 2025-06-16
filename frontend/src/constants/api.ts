@@ -20,6 +20,13 @@ export const API_ENDPOINTS = {
     CHARACTERS: `${API_BASE_URL}/inventory/characters`,
     PETS: `${API_BASE_URL}/inventory/pets`,
     ITEMS: `${API_BASE_URL}/inventory/items`,
+    GRID: `${API_BASE_URL}/inventory/grid`,
+    GRID_CHARACTERS: `${API_BASE_URL}/inventory/grid/characters`,
+    GRID_PETS: `${API_BASE_URL}/inventory/grid/pets`,
+    GRID_ITEMS: `${API_BASE_URL}/inventory/grid/items`,
+    CHARACTER_DETAIL: `${API_BASE_URL}/inventory/character`,
+    PET_DETAIL: `${API_BASE_URL}/inventory/pet`,
+    ITEM_DETAIL: `${API_BASE_URL}/inventory/item`,
   },
   DATA: {
     CHARACTERS: `${API_BASE_URL}/data/characters`,

@@ -13,6 +13,7 @@ interface AuthState {
   user: UserProfile | null;
   token: string | null;
   isLoading: boolean;
+  isRefreshing: boolean;
   error: string | null;
 }
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user: null,
     token: localStorage.getItem("token"),
     isLoading: false,
+    isRefreshing: false,
     error: null,
   });
 
@@ -147,23 +149,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshProfile = async () => {
     if (!authState.token) return;
 
-    setAuthState((prev) => ({ ...prev, isLoading: true }));
+    console.log("👤 Starting profile refresh...");
+    // Use separate refreshing state instead of main loading state
+    setAuthState((prev) => ({ ...prev, isRefreshing: true }));
     try {
+      console.log("👤 Calling authAPI.getProfile...");
       const response = await authAPI.getProfile(authState.token);
+      console.log("👤 Profile response:", response);
+
       if (response.success) {
+        console.log("👤 Profile refresh successful, updating state...");
         setAuthState((prev) => ({
           ...prev,
           user: response.user,
-          isLoading: false,
+          isRefreshing: false,
           error: null,
         }));
+        console.log("👤 Profile state updated");
       } else {
         throw new Error("Failed to refresh profile");
       }
     } catch (error: any) {
+      console.error("👤 Profile refresh error:", error);
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
+        isRefreshing: false,
         error: error.message || "Failed to refresh profile",
       }));
       throw error;

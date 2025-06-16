@@ -30,7 +30,22 @@ export interface Item {
   effect: string;
 }
 
-export type GachaItem = Character | Pet | Item;
+export interface Equipment {
+  id: string;
+  name: string;
+  rarity: Rarity;
+  type: "weapon" | "armor" | "accessory";
+  stats: {
+    hp?: number;
+    attack?: number;
+    defense?: number;
+    speed?: number;
+    critRate?: number;
+    critDamage?: number;
+  };
+}
+
+export type GachaItem = Character | Pet | Item | Equipment;
 
 export interface Banner {
   id: string;
@@ -57,6 +72,7 @@ export interface GachaPool {
   characters: Character[];
   pets: Pet[];
   items: Item[];
+  equipments?: Equipment[];
   banners: Banner[];
   rates: {
     R: number;
@@ -66,7 +82,7 @@ export interface GachaPool {
 }
 
 export interface GachaPull {
-  type: "character" | "pet" | "item";
+  type: "character" | "pet" | "item" | "equipment";
   item: GachaItem;
 }
 

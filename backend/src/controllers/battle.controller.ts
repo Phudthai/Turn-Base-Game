@@ -3,11 +3,16 @@ import { BattleAction } from "../types/battle.types";
 
 export const startBattle = async ({
   body,
+  user,
 }: {
   body: { characterIds: string[] };
+  user: any;
 }) => {
   try {
-    const battleState = await BattleService.createBattle(body.characterIds);
+    const battleState = await BattleService.createBattle(
+      user.id,
+      body.characterIds
+    );
     return {
       success: true,
       data: battleState,

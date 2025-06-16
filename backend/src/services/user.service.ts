@@ -1,6 +1,6 @@
 import { User, IUser, UserResponse } from "../models/user.model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { generateToken } from "../utils/auth";
 import { CharacterService } from "./character.service";
 import { ItemService } from "./item.service";
 import { EquipmentService } from "./equipment.service";
@@ -90,12 +90,14 @@ export class UserService {
     }
   }
 
-  static generateToken(user: IUser): string {
-    return jwt.sign(
-      { id: user._id, username: user.username },
-      process.env.JWT_SECRET || "your-secret-key",
-      { expiresIn: "7d" }
-    );
+  static async generateToken(user: IUser): Promise<string> {
+    return await generateToken({
+      id: user._id.toString(),
+      username: user.username,
+      level: user.level,
+      experience: user.experience,
+      currency: user.currency,
+    });
   }
 
   // Update user currency

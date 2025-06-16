@@ -31,7 +31,7 @@ export class AuthController {
       }
 
       // Generate token
-      const token = UserService.generateToken(userForToken);
+      const token = await UserService.generateToken(userForToken);
 
       return {
         success: true,
@@ -72,7 +72,7 @@ export class AuthController {
       }
 
       // Generate token
-      const token = UserService.generateToken(user);
+      const token = await UserService.generateToken(user);
 
       // Update last login
       await UserService.updateGameProgress(user._id, {});

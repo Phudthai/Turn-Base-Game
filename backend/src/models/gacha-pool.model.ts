@@ -59,6 +59,41 @@ const ItemSchema = new Schema<IItem>({
   effect: { type: String, required: true },
 });
 
+// Equipment interface and schema
+export interface IEquipment {
+  id: string;
+  name: string;
+  rarity: "R" | "SR" | "SSR";
+  type: "weapon" | "armor" | "accessory";
+  stats: {
+    hp?: number;
+    attack?: number;
+    defense?: number;
+    speed?: number;
+    critRate?: number;
+    critDamage?: number;
+  };
+}
+
+const EquipmentSchema = new Schema<IEquipment>({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  rarity: { type: String, enum: ["R", "SR", "SSR"], required: true },
+  type: {
+    type: String,
+    enum: ["weapon", "armor", "accessory"],
+    required: true,
+  },
+  stats: {
+    hp: { type: Number, min: 0 },
+    attack: { type: Number, min: 0 },
+    defense: { type: Number, min: 0 },
+    speed: { type: Number, min: 0 },
+    critRate: { type: Number, min: 0, max: 1 },
+    critDamage: { type: Number, min: 0 },
+  },
+});
+
 // Banner interface and schema
 export interface IBanner {
   id: string;
@@ -115,6 +150,7 @@ export interface IGachaPool extends Document {
   characters: ICharacter[];
   pets: IPet[];
   items: IItem[];
+  equipments: IEquipment[];
   banners: IBanner[];
   rates: {
     R: number;
@@ -131,6 +167,7 @@ const GachaPoolSchema = new Schema<IGachaPool>(
     characters: [CharacterSchema],
     pets: [PetSchema],
     items: [ItemSchema],
+    equipments: [EquipmentSchema],
     banners: [BannerSchema],
     rates: {
       R: { type: Number, required: true, min: 0, max: 1, default: 0.85 },
@@ -174,4 +211,5 @@ export const GachaPool = mongoose.model<IGachaPool>(
 export type Character = ICharacter;
 export type Pet = IPet;
 export type Item = IItem;
+export type Equipment = IEquipment;
 export type Banner = IBanner;

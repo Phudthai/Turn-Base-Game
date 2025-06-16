@@ -42,6 +42,7 @@ export const performSinglePull = (
       ...pool.characters.filter((c) => c.rarity === "SSR"),
       ...pool.pets.filter((p) => p.rarity === "SSR"),
       ...pool.items.filter((i) => i.rarity === "SSR"),
+      ...(pool.equipments?.filter((e) => e.rarity === "SSR") || []),
     ];
 
     if (ssrItems.length > 0) {
@@ -58,6 +59,7 @@ export const performSinglePull = (
     ...pool.characters.filter((c) => c.rarity === rarity),
     ...pool.pets.filter((p) => p.rarity === rarity),
     ...pool.items.filter((i) => i.rarity === rarity),
+    ...(pool.equipments?.filter((e) => e.rarity === rarity) || []),
   ];
 
   // Split items into featured and non-featured
@@ -107,6 +109,7 @@ export const performMultiPull = (
         ...pool.characters.filter((c) => c.rarity === "SSR"),
         ...pool.pets.filter((p) => p.rarity === "SSR"),
         ...pool.items.filter((i) => i.rarity === "SSR"),
+        ...(pool.equipments?.filter((e) => e.rarity === "SSR") || []),
       ];
 
       if (ssrItems.length > 0) {
@@ -140,6 +143,7 @@ export const performMultiPull = (
       ...pool.characters.filter((c) => c.rarity === "SR"),
       ...pool.pets.filter((p) => p.rarity === "SR"),
       ...pool.items.filter((i) => i.rarity === "SR"),
+      ...(pool.equipments?.filter((e) => e.rarity === "SR") || []),
     ];
 
     if (srItems.length > 0) {
@@ -158,8 +162,9 @@ export const performMultiPull = (
 export const determineItemType = (
   pool: GachaPool,
   item: GachaItem
-): "character" | "pet" | "item" => {
+): "character" | "pet" | "item" | "equipment" => {
   if (pool.characters.some((c) => c.id === item.id)) return "character";
   if (pool.pets.some((p) => p.id === item.id)) return "pet";
+  if (pool.equipments?.some((e) => e.id === item.id)) return "equipment";
   return "item";
 };

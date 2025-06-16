@@ -4,6 +4,7 @@ import { ENV } from "./config/env";
 import { configureRoutes } from "./config/routes";
 import { app } from "./app";
 import { connectDatabase } from "./config/database";
+import { seedDatabase } from "./data/seed-data";
 
 const PORT = process.env.PORT || 8000;
 
@@ -11,6 +12,9 @@ async function startServer() {
   try {
     // Connect to MongoDB first
     await connectDatabase();
+
+    // Seed database with initial data
+    await seedDatabase();
 
     // Start the server
     app.listen(PORT, () => {

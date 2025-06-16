@@ -28,53 +28,48 @@ export class EquipmentService {
     }
   }
 
-  // Create user equipment instance
+  // Create user equipment from gacha
   static async createUserEquipment(
     userId: string,
     equipmentId: string,
-    obtainedFrom:
-      | "gacha"
-      | "event"
-      | "trade"
-      | "gift"
-      | "craft"
-      | "drop" = "gacha"
+    obtainedFrom: string = "gacha"
   ): Promise<IUserEquipment> {
     try {
+      // Get equipment template
       const equipmentTemplate = await Equipment.findOne({ id: equipmentId });
       if (!equipmentTemplate) {
         throw new Error(`Equipment template not found: ${equipmentId}`);
       }
 
+      // Create user equipment instance
       const userEquipment = new UserEquipment({
         userId,
         equipmentId,
         enhancementLevel: 0,
-        currentStats: equipmentTemplate.baseStats,
         substats: [],
-        equippedTo: null,
-        metadata: {
-          obtainedAt: new Date(),
-          obtainedFrom,
-          isLocked: false,
-          isFavorite: false,
-          nickname: null,
-        },
+        isLocked: false,
+        obtainedFrom,
+        obtainedAt: new Date(),
       });
 
-      return await userEquipment.save();
+      const savedEquipment = await userEquipment.save();
+      console.log(`Created user equipment: ${equipmentId} for user: ${userId}`);
+
+      return savedEquipment;
     } catch (error) {
       console.error("Error creating user equipment:", error);
       throw error;
     }
   }
 
-  // Get user's equipments
+  // Get user equipments
   static async getUserEquipments(userId: string): Promise<IUserEquipment[]> {
     try {
-      return await UserEquipment.find({ userId }).sort({
-        "metadata.obtainedAt": -1,
-      });
+      const userEquipments = await UserEquipment.find({ userId })
+        .populate("equipmentId")
+        .sort({ obtainedAt: -1 });
+
+      return userEquipments;
     } catch (error) {
       console.error("Error getting user equipments:", error);
       throw error;
@@ -95,7 +90,7 @@ export class EquipmentService {
   static async enhanceEquipment(
     userId: string,
     userEquipmentId: string,
-    materialItems: Array<{ itemId: string; quantity: number }>
+    materials: any[]
   ): Promise<IUserEquipment | null> {
     try {
       const userEquipment = await UserEquipment.findOne({
@@ -103,31 +98,103 @@ export class EquipmentService {
         userId,
       });
 
-      if (!userEquipment) return null;
+      if (!userEquipment) {
+        throw new Error("User equipment not found");
+      }
 
+      // Get equipment template for enhancement requirements
       const equipmentTemplate = await Equipment.findOne({
         id: userEquipment.equipmentId,
       });
-
-      if (!equipmentTemplate) return null;
-
-      // TODO: Implement enhancement logic
-      // For now, just increment enhancement level
-      if (
-        userEquipment.enhancementLevel <
-        equipmentTemplate.enhancementLevels.maxLevel
-      ) {
-        userEquipment.enhancementLevel += 1;
-
-        // TODO: Recalculate stats based on enhancement level
-        console.log(
-          `🔨 Equipment enhanced to level ${userEquipment.enhancementLevel}!`
-        );
+      if (!equipmentTemplate) {
+        throw new Error("Equipment template not found");
       }
 
-      return await userEquipment.save();
+      const currentLevel = userEquipment.enhancementLevel;
+      const maxLevel = equipmentTemplate.enhancementLevels?.maxLevel || 20;
+
+      if (currentLevel >= maxLevel) {
+        throw new Error("Equipment is already at maximum level");
+      }
+
+      // TODO: Implement material checking and consumption logic
+      // For now, just increment the level
+      userEquipment.enhancementLevel += 1;
+
+      const savedEquipment = await userEquipment.save();
+      console.log(
+        `Enhanced equipment ${userEquipmentId} to level ${savedEquipment.enhancementLevel}`
+      );
+
+      return savedEquipment;
     } catch (error) {
       console.error("Error enhancing equipment:", error);
+      throw error;
+    }
+  }
+
+  // Equip equipment to character
+  static async equipToCharacter(
+    userId: string,
+    userEquipmentId: string,
+    userCharacterId: string,
+    slot: string
+  ): Promise<IUserEquipment | null> {
+    try {
+      const userEquipment = await UserEquipment.findOne({
+        _id: userEquipmentId,
+        userId,
+      });
+
+      if (!userEquipment) {
+        throw new Error("User equipment not found");
+      }
+
+      // Unequip from previous character if equipped
+      if (userEquipment.equippedTo) {
+        // TODO: Remove from previous character's equipment slots
+      }
+
+      // Equip to new character
+      userEquipment.equippedTo = userCharacterId;
+      userEquipment.equippedSlot = slot;
+
+      const savedEquipment = await userEquipment.save();
+      console.log(
+        `Equipped ${userEquipmentId} to character ${userCharacterId} in slot ${slot}`
+      );
+
+      return savedEquipment;
+    } catch (error) {
+      console.error("Error equipping equipment:", error);
+      throw error;
+    }
+  }
+
+  // Unequip equipment
+  static async unequipEquipment(
+    userId: string,
+    userEquipmentId: string
+  ): Promise<IUserEquipment | null> {
+    try {
+      const userEquipment = await UserEquipment.findOne({
+        _id: userEquipmentId,
+        userId,
+      });
+
+      if (!userEquipment) {
+        throw new Error("User equipment not found");
+      }
+
+      userEquipment.equippedTo = undefined;
+      userEquipment.equippedSlot = undefined;
+
+      const savedEquipment = await userEquipment.save();
+      console.log(`Unequipped equipment ${userEquipmentId}`);
+
+      return savedEquipment;
+    } catch (error) {
+      console.error("Error unequipping equipment:", error);
       throw error;
     }
   }
