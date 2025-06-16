@@ -1,0 +1,224 @@
+{
+  "info": {
+    "name": "Idle Picoen - Data Management API",
+    "description": "API endpoints for managing game data (Characters, Pets, Items, Gacha Pool)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "📊 Data Overview",
+      "item": [
+        {
+          "name": "Get All Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data"]
+            }
+          }
+        },
+        {
+          "name": "Initialize Sample Data",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data/init",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "init"]
+            }
+          }
+        },
+        {
+          "name": "Clear All Data",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data/clear",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "clear"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚔️ Characters",
+      "item": [
+        {
+          "name": "Add Single Character",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"char_004\",\n  \"name\": \"Shadow Assassin\",\n  \"rarity\": \"SSR\",\n  \"element\": \"dark\",\n  \"characterType\": \"archer\",\n  \"baseStats\": {\n    \"hp\": 800,\n    \"attack\": 220,\n    \"defense\": 90,\n    \"speed\": 140,\n    \"critRate\": 25,\n    \"critDamage\": 200\n  },\n  \"growthRates\": {\n    \"hp\": 30,\n    \"attack\": 10,\n    \"defense\": 4,\n    \"speed\": 4\n  },\n  \"skills\": [\n    {\n      \"id\": \"skill_004\",\n      \"name\": \"Shadow Strike\",\n      \"description\": \"High critical damage attack\",\n      \"cooldown\": 2,\n      \"manaCost\": 35\n    }\n  ],\n  \"maxLevel\": 60,\n  \"artwork\": {\n    \"icon\": \"/images/characters/shadow_assassin_icon.png\",\n    \"portrait\": \"/images/characters/shadow_assassin_portrait.png\",\n    \"fullArt\": \"/images/characters/shadow_assassin_full.png\"\n  },\n  \"lore\": \"A mysterious assassin from the shadows.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/characters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "characters"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Add Characters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characters\": [\n    {\n      \"id\": \"char_005\",\n      \"name\": \"Lightning Mage\",\n      \"rarity\": \"SR\",\n      \"element\": \"air\",\n      \"characterType\": \"mage\",\n      \"baseStats\": {\n        \"hp\": 950,\n        \"attack\": 170,\n        \"defense\": 85,\n        \"speed\": 115,\n        \"critRate\": 14,\n        \"critDamage\": 145\n      },\n      \"growthRates\": {\n        \"hp\": 38,\n        \"attack\": 8,\n        \"defense\": 4,\n        \"speed\": 3\n      },\n      \"skills\": [\n        {\n          \"id\": \"skill_005\",\n          \"name\": \"Thunder Bolt\",\n          \"description\": \"Fast lightning attack\",\n          \"cooldown\": 1,\n          \"manaCost\": 22\n        }\n      ],\n      \"maxLevel\": 60,\n      \"artwork\": {\n        \"icon\": \"/images/characters/lightning_mage_icon.png\",\n        \"portrait\": \"/images/characters/lightning_mage_portrait.png\",\n        \"fullArt\": \"/images/characters/lightning_mage_full.png\"\n      },\n      \"lore\": \"Master of lightning magic.\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/characters/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "characters", "bulk"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🐾 Pets",
+      "item": [
+        {
+          "name": "Add Single Pet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"pet_004\",\n  \"name\": \"Thunder Bird\",\n  \"rarity\": \"SR\",\n  \"element\": \"air\",\n  \"petType\": \"battle\",\n  \"baseStats\": {\n    \"hp\": 350,\n    \"attack\": 70,\n    \"defense\": 55,\n    \"speed\": 130\n  },\n  \"bonuses\": [\n    {\n      \"type\": \"stat_boost\",\n      \"target\": \"lightning_damage\",\n      \"value\": 20,\n      \"description\": \"Increases lightning damage by 20%\"\n    }\n  ],\n  \"skills\": [\n    {\n      \"id\": \"pet_skill_004\",\n      \"name\": \"Lightning Strike\",\n      \"description\": \"Quick lightning attack\",\n      \"cooldown\": 2,\n      \"effect\": \"lightning_damage\"\n    }\n  ],\n  \"maxLevel\": 40,\n  \"artwork\": {\n    \"icon\": \"/images/pets/thunder_bird_icon.png\",\n    \"portrait\": \"/images/pets/thunder_bird_portrait.png\",\n    \"fullArt\": \"/images/pets/thunder_bird_full.png\"\n  },\n  \"lore\": \"A majestic bird that commands the thunder.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/pets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "pets"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Add Pets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pets\": [\n    {\n      \"id\": \"pet_005\",\n      \"name\": \"Crystal Turtle\",\n      \"rarity\": \"R\",\n      \"element\": \"earth\",\n      \"petType\": \"passive\",\n      \"baseStats\": {\n        \"hp\": 500,\n        \"attack\": 25,\n        \"defense\": 80,\n        \"speed\": 50\n      },\n      \"bonuses\": [\n        {\n          \"type\": \"stat_boost\",\n          \"target\": \"defense\",\n          \"value\": 10,\n          \"description\": \"Increases defense by 10%\"\n        }\n      ],\n      \"skills\": [\n        {\n          \"id\": \"pet_skill_005\",\n          \"name\": \"Shell Defense\",\n          \"description\": \"Increases team defense\",\n          \"cooldown\": 6,\n          \"effect\": \"defense_buff\"\n        }\n      ],\n      \"maxLevel\": 40,\n      \"artwork\": {\n        \"icon\": \"/images/pets/crystal_turtle_icon.png\",\n        \"portrait\": \"/images/pets/crystal_turtle_portrait.png\",\n        \"fullArt\": \"/images/pets/crystal_turtle_full.png\"\n      },\n      \"lore\": \"A peaceful turtle with crystalline shell.\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/pets/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "pets", "bulk"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎒 Items",
+      "item": [
+        {
+          "name": "Add Single Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"item_004\",\n  \"name\": \"Mana Potion\",\n  \"description\": \"Restores 200 MP to a character\",\n  \"rarity\": \"R\",\n  \"type\": \"consumable\",\n  \"subType\": \"potion\",\n  \"effects\": [\n    {\n      \"type\": \"buff\",\n      \"value\": 200,\n      \"target\": \"character\",\n      \"duration\": 0\n    }\n  ],\n  \"stackLimit\": 99,\n  \"sellPrice\": 8,\n  \"tradeable\": true,\n  \"artwork\": {\n    \"icon\": \"/images/items/mana_potion_icon.png\",\n    \"thumbnail\": \"/images/items/mana_potion_thumb.png\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "items"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Add Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"id\": \"item_005\",\n      \"name\": \"Experience Scroll\",\n      \"description\": \"Grants 1000 experience points\",\n      \"rarity\": \"SR\",\n      \"type\": \"consumable\",\n      \"subType\": \"scroll\",\n      \"effects\": [\n        {\n          \"type\": \"experience\",\n          \"value\": 1000,\n          \"target\": \"character\"\n        }\n      ],\n      \"stackLimit\": 20,\n      \"sellPrice\": 50,\n      \"tradeable\": true,\n      \"artwork\": {\n        \"icon\": \"/images/items/exp_scroll_icon.png\",\n        \"thumbnail\": \"/images/items/exp_scroll_thumb.png\"\n      }\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/items/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "items", "bulk"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎰 Gacha Pool",
+      "item": [
+        {
+          "name": "Create Gacha Pool",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version\": \"1.1.0\",\n  \"characters\": [\n    {\n      \"id\": \"char_001\",\n      \"name\": \"Fire Knight\",\n      \"rarity\": \"SSR\",\n      \"stats\": {\n        \"hp\": 1200,\n        \"attack\": 180,\n        \"defense\": 120\n      }\n    },\n    {\n      \"id\": \"char_002\",\n      \"name\": \"Water Mage\",\n      \"rarity\": \"SR\",\n      \"stats\": {\n        \"hp\": 900,\n        \"attack\": 160,\n        \"defense\": 80\n      }\n    },\n    {\n      \"id\": \"char_003\",\n      \"name\": \"Earth Guard\",\n      \"rarity\": \"R\",\n      \"stats\": {\n        \"hp\": 1400,\n        \"attack\": 100,\n        \"defense\": 180\n      }\n    }\n  ],\n  \"pets\": [\n    {\n      \"id\": \"pet_001\",\n      \"name\": \"Fire Drake\",\n      \"rarity\": \"SSR\",\n      \"bonus\": {\n        \"type\": \"fire_damage\",\n        \"value\": 25\n      }\n    },\n    {\n      \"id\": \"pet_002\",\n      \"name\": \"Healing Fairy\",\n      \"rarity\": \"SR\",\n      \"bonus\": {\n        \"type\": \"healing_potency\",\n        \"value\": 20\n      }\n    }\n  ],\n  \"items\": [\n    {\n      \"id\": \"item_001\",\n      \"name\": \"Health Potion\",\n      \"rarity\": \"R\",\n      \"effect\": \"heal 500\"\n    },\n    {\n      \"id\": \"item_002\",\n      \"name\": \"Power Crystal\",\n      \"rarity\": \"SR\",\n      \"effect\": \"craft 1\"\n    }\n  ],\n  \"banners\": [\n    {\n      \"id\": \"standard_banner\",\n      \"name\": \"Standard Summon\",\n      \"type\": \"standard\",\n      \"featured\": {\n        \"items\": [],\n        \"rateUp\": 0\n      },\n      \"cost\": {\n        \"currency\": \"gems\",\n        \"amount\": 160,\n        \"discount\": {\n          \"multiPull\": 0\n        }\n      },\n      \"isActive\": true\n    },\n    {\n      \"id\": \"fire_event_banner\",\n      \"name\": \"Fire Element Rate UP!\",\n      \"type\": \"event\",\n      \"featured\": {\n        \"items\": [\"char_001\", \"pet_001\"],\n        \"rateUp\": 0.5\n      },\n      \"cost\": {\n        \"currency\": \"gems\",\n        \"amount\": 160,\n        \"discount\": {\n          \"multiPull\": 0\n        }\n      },\n      \"duration\": {\n        \"start\": \"2024-01-01T00:00:00.000Z\",\n        \"end\": \"2024-12-31T23:59:59.999Z\"\n      },\n      \"isActive\": true\n    }\n  ],\n  \"rates\": {\n    \"R\": 0.85,\n    \"SR\": 0.13,\n    \"SSR\": 0.02\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/gacha-pool",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "gacha-pool"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,746 @@
+{
+  "info": {
+    "name": "Idle Picoen - Complete API Collection",
+    "description": "Complete API collection for Idle Picoen game including Authentication, Data Management, Gacha, Inventory, and Battle systems",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "🏠 Server Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Welcome Message",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.token) {",
+                  "        pm.collectionVariables.set('authToken', response.token);",
+                  "        console.log('Auth token saved:', response.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.token) {",
+                  "        pm.collectionVariables.set('authToken', response.token);",
+                  "        console.log('Auth token saved:', response.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Add Currency (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gems\": 10000,\n  \"coins\": 50000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/add-currency",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "add-currency"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Data Management",
+      "item": [
+        {
+          "name": "Get All Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data"]
+            }
+          }
+        },
+        {
+          "name": "Initialize Sample Data",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data/init",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "init"]
+            }
+          }
+        },
+        {
+          "name": "Clear All Data",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data/clear",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "clear"]
+            }
+          }
+        },
+        {
+          "name": "Add Character",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"char_004\",\n  \"name\": \"Shadow Assassin\",\n  \"rarity\": \"SSR\",\n  \"element\": \"dark\",\n  \"characterType\": \"archer\",\n  \"baseStats\": {\n    \"hp\": 800,\n    \"attack\": 220,\n    \"defense\": 90,\n    \"speed\": 140,\n    \"critRate\": 25,\n    \"critDamage\": 200\n  },\n  \"growthRates\": {\n    \"hp\": 30,\n    \"attack\": 10,\n    \"defense\": 4,\n    \"speed\": 4\n  },\n  \"skills\": [\n    {\n      \"id\": \"skill_004\",\n      \"name\": \"Shadow Strike\",\n      \"description\": \"High critical damage attack\",\n      \"cooldown\": 2,\n      \"manaCost\": 35\n    }\n  ],\n  \"maxLevel\": 60,\n  \"artwork\": {\n    \"icon\": \"/images/characters/shadow_assassin_icon.png\",\n    \"portrait\": \"/images/characters/shadow_assassin_portrait.png\",\n    \"fullArt\": \"/images/characters/shadow_assassin_full.png\"\n  },\n  \"lore\": \"A mysterious assassin from the shadows.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/characters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "characters"]
+            }
+          }
+        },
+        {
+          "name": "Add Pet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"pet_003\",\n  \"name\": \"Lucky Cat\",\n  \"rarity\": \"R\",\n  \"element\": \"neutral\",\n  \"petType\": \"farming\",\n  \"baseStats\": {\n    \"hp\": 200,\n    \"attack\": 30,\n    \"defense\": 40,\n    \"speed\": 80\n  },\n  \"bonuses\": [\n    {\n      \"type\": \"resource_bonus\",\n      \"target\": \"coin_drop\",\n      \"value\": 15,\n      \"description\": \"Increases coin drops by 15%\"\n    }\n  ],\n  \"skills\": [\n    {\n      \"id\": \"pet_skill_003\",\n      \"name\": \"Lucky Charm\",\n      \"description\": \"Increases item drop rate\",\n      \"cooldown\": 5,\n      \"effect\": \"luck_boost\"\n    }\n  ],\n  \"maxLevel\": 40,\n  \"artwork\": {\n    \"icon\": \"/images/pets/lucky_cat_icon.png\",\n    \"portrait\": \"/images/pets/lucky_cat_portrait.png\",\n    \"fullArt\": \"/images/pets/lucky_cat_full.png\"\n  },\n  \"lore\": \"A charming cat that brings good fortune.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/pets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "data", "pets"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎰 Gacha System",
+      "item": [
+        {
+          "name": "Get All Banners",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/gacha/banners",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gacha", "banners"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Banners",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/gacha/banners/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gacha", "banners", "active"]
+            }
+          }
+        },
+        {
+          "name": "Get Banner by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/gacha/banners/standard_banner",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gacha", "banners", "standard_banner"]
+            }
+          }
+        },
+        {
+          "name": "Single Pull - Standard Banner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bannerId\": \"standard_banner\",\n  \"multi\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/gacha/pull",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gacha", "pull"]
+            }
+          }
+        },
+        {
+          "name": "Multi Pull (10x) - Standard Banner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bannerId\": \"standard_banner\",\n  \"multi\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/gacha/pull",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gacha", "pull"]
+            }
+          }
+        },
+        {
+          "name": "Single Pull - Fire Knight Banner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bannerId\": \"fire_knight_banner\",\n  \"multi\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/gacha/pull",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gacha", "pull"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎒 Inventory",
+      "item": [
+        {
+          "name": "Get User Characters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/characters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", "characters"]
+            }
+          }
+        },
+        {
+          "name": "Get User Pets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/pets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", "pets"]
+            }
+          }
+        },
+        {
+          "name": "Get User Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", "items"]
+            }
+          }
+        },
+        {
+          "name": "Get Complete Inventory",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory"]
+            }
+          }
+        },
+        {
+          "name": "Get Character Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/characters/CHARACTER_ID",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", "characters", "CHARACTER_ID"]
+            },
+            "description": "Replace CHARACTER_ID with actual user character _id from previous requests"
+          }
+        },
+        {
+          "name": "Level Up Character",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"experience\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/characters/CHARACTER_ID/level-up",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "inventory",
+                "characters",
+                "CHARACTER_ID",
+                "level-up"
+              ]
+            },
+            "description": "Replace CHARACTER_ID with actual user character _id"
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚔️ Battle System",
+      "item": [
+        {
+          "name": "Start Battle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team\": [\"CHARACTER_ID_1\", \"CHARACTER_ID_2\"],\n  \"opponent\": \"enemy_001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/battle/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "battle", "start"]
+            },
+            "description": "Replace CHARACTER_ID with actual user character _ids"
+          }
+        },
+        {
+          "name": "Execute Battle Action",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"battleId\": \"BATTLE_ID\",\n  \"action\": {\n    \"type\": \"attack\",\n    \"characterId\": \"CHARACTER_ID\",\n    \"targetId\": \"enemy_001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/battle/action",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "battle", "action"]
+            },
+            "description": "Replace BATTLE_ID and CHARACTER_ID with actual values"
+          }
+        },
+        {
+          "name": "Get Battle History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/battle/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "battle", "history"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Testing Workflows",
+      "item": [
+        {
+          "name": "Complete Setup Workflow",
+          "item": [
+            {
+              "name": "1. Health Check",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["health"]
+                }
+              }
+            },
+            {
+              "name": "2. Initialize Sample Data",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/data/init",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "data", "init"]
+                }
+              }
+            },
+            {
+              "name": "3. Register User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.success && response.token) {",
+                      "        pm.collectionVariables.set('authToken', response.token);",
+                      "        console.log('Auth token saved:', response.token);",
+                      "    }",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              }
+            },
+            {
+              "name": "4. Add Starting Currency",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"gems\": 10000,\n  \"coins\": 50000\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/add-currency",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "add-currency"]
+                }
+              }
+            },
+            {
+              "name": "5. Check Banners",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/gacha/banners",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "gacha", "banners"]
+                }
+              }
+            },
+            {
+              "name": "6. Do 10x Pull",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bannerId\": \"standard_banner\",\n  \"multi\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/gacha/pull",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "gacha", "pull"]
+                }
+              }
+            },
+            {
+              "name": "7. Check Inventory",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/inventory",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "inventory"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,280 @@
+{
+  "info": {
+    "_postman_id": "b5e2b5a0-0b0a-4b0a-8b0a-0b0a4b0a8b0a",
+    "name": "Turnbase-Game",
+    "description": "Collection for testing the Turnbase Game API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"token\", jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login and get JWT token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gacha",
+      "item": [
+        {
+          "name": "Single Pull",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/gacha/pull?bannerId=standard_001&multi=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["gacha", "pull"],
+              "query": [
+                {
+                  "key": "bannerId",
+                  "value": "standard_001"
+                },
+                {
+                  "key": "multi",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Perform a single gacha pull"
+          }
+        },
+        {
+          "name": "Multi Pull",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/gacha/pull?bannerId=standard_001&multi=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["gacha", "pull"],
+              "query": [
+                {
+                  "key": "bannerId",
+                  "value": "standard_001"
+                },
+                {
+                  "key": "multi",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Perform a multi (10x) gacha pull"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Battle",
+      "item": [
+        {
+          "name": "Start Battle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"characterIds\": [\"char_mage\", \"char_healer\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/battle/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "start"]
+            },
+            "description": "Start a new battle with selected characters"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success) {",
+                  "    pm.environment.set(\"battleId\", jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Battle State",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/battle/{{battleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "{{battleId}}"]
+            },
+            "description": "Get current battle state"
+          }
+        },
+        {
+          "name": "Perform Basic Attack",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"basic_attack\",\n    \"characterId\": \"char_mage\",\n    \"targetIds\": [\"enemy_wolf\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/battle/{{battleId}}/action",
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "{{battleId}}", "action"]
+            },
+            "description": "Perform a basic attack action"
+          }
+        },
+        {
+          "name": "Use Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"skill\",\n    \"characterId\": \"char_mage\",\n    \"targetIds\": [\"enemy_wolf\"],\n    \"skillId\": \"skill_fireball\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/battle/{{battleId}}/action",
+              "host": ["{{baseUrl}}"],
+              "path": ["battle", "{{battleId}}", "action"]
+            },
+            "description": "Use a character skill"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    }
+  ]
+}
+ 
