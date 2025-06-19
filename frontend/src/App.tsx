@@ -11,6 +11,8 @@ import {
 import { GachaScreen } from "./components/screens/GachaScreen";
 import { BattleScreen } from "./components/screens/BattleScreen";
 import { InventoryScreen } from "./components/screens/InventoryScreen";
+import { GameLobby } from "./components/screens/GameLobby";
+import { SettingsScreen } from "./components/screens/SettingsScreen";
 
 // Loading component
 function LoadingScreen() {
@@ -42,7 +44,7 @@ function ErrorBanner({
 
 // Main app component
 function AppContent() {
-  const [gameState, setGameState] = useState<GameState>("dashboard");
+  const [gameState, setGameState] = useState<GameState>("lobby");
   const { user, isLoading, error, clearError, logout } = useAuth();
 
   console.log(
@@ -68,16 +70,30 @@ function AppContent() {
     }
 
     switch (gameState) {
+      case "lobby":
+        return <GameLobby onNavigate={setGameState} />;
       case "dashboard":
         return <DashboardScreen onNavigate={setGameState} />;
       case "gacha":
-        return <GachaScreen onBack={() => setGameState("dashboard")} />;
+        return <GachaScreen onBack={() => setGameState("lobby")} />;
       case "battle":
-        return <BattleScreen onBack={() => setGameState("dashboard")} />;
+        return <BattleScreen onBack={() => setGameState("lobby")} />;
       case "inventory":
-        return <InventoryScreen onBack={() => setGameState("dashboard")} />;
-      default:
+        return <InventoryScreen onBack={() => setGameState("lobby")} />;
+      case "settings":
+        return <SettingsScreen onBack={() => setGameState("lobby")} />;
+      case "shop":
         return <DashboardScreen onNavigate={setGameState} />;
+      case "guild":
+        return <DashboardScreen onNavigate={setGameState} />;
+      case "dungeon":
+        return <DashboardScreen onNavigate={setGameState} />;
+      case "pvp":
+        return <DashboardScreen onNavigate={setGameState} />;
+      case "events":
+        return <DashboardScreen onNavigate={setGameState} />;
+      default:
+        return <GameLobby onNavigate={setGameState} />;
     }
   };
 
@@ -85,23 +101,7 @@ function AppContent() {
     <div className="app">
       {error && <ErrorBanner error={error} onClear={clearError} />}
 
-      <header className="app-header">
-        <h1>🎮 Idle: Picoen</h1>
-        {user && (
-          <div className="user-info">
-            <span>Welcome, {user.username}!</span>
-            <div className="currency-display">
-              <span className="gems">💎 {user.currency?.gems || 0}</span>
-              <span className="coins">🪙 {user.currency?.coins || 0}</span>
-            </div>
-            <button onClick={logout} className="logout-btn">
-              Logout
-            </button>
-          </div>
-        )}
-      </header>
-
-      <main className="app-main">{renderScreen()}</main>
+      <main className="app-main full-screen">{renderScreen()}</main>
     </div>
   );
 }

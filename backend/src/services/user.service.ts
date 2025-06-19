@@ -27,15 +27,15 @@ export class UserService {
         username,
         password: hashedPassword,
         level: 1,
-        experience: 0,
+        experience: 25, // Starting experience for better UX
         inventory: {
           characters: [],
           pets: [],
           items: [],
         },
         currency: {
-          gems: 0, // No starting gems - use postman to add
-          coins: 0, // No starting coins - use postman to add
+          gems: 100, // Starting gems for tutorial
+          coins: 1000, // Starting coins for tutorial
         },
         pity: {
           standardPity: 0,

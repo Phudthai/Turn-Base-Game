@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useGameAPI } from "../../hooks/useGameAPI";
 import type { InventoryResponse } from "../../types/types";
+import InventoryModal from "../InventoryModal";
 
 interface InventoryScreenProps {
   onBack: () => void;
@@ -43,6 +44,13 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [inventory, setInventory] = useState<InventoryResponse | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedItemType, setSelectedItemType] = useState<
+    "character" | "pet" | "equipment" | "item" | null
+  >(null);
 
   const [filters, setFilters] = useState<FilterState>({
     characters: {
@@ -116,6 +124,20 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
         },
       },
     }));
+  };
+
+  // Modal handlers
+  const openItemDetail = (itemId: string, itemType: string) => {
+    // Support all item types
+    setSelectedItemId(itemId);
+    setSelectedItemType(itemType as "character" | "pet" | "equipment" | "item");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedItemId(null);
+    setSelectedItemType(null);
   };
 
   const getGradeFromId = (id: string): string => {
@@ -758,7 +780,9 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
         key={`${type}-${item.id}-${Math.random()}`}
         className={`inventory-item-card ${type}-card ${
           item.isLocked ? "locked-card" : ""
-        }`}
+        } clickable`}
+        onClick={() => openItemDetail(item.id, type)}
+        style={{ cursor: "pointer" }}
       >
         {/* Grade badge and Type badge in top-right corner */}
         <div className="grade-corner">
@@ -893,151 +917,151 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
         ← Back
       </button>
 
-      <div className="inventory-header">
+      <div className="inventory-container">
         <h2>🎒 Inventory</h2>
-        <div className="user-info">
-          <div className="user-stats">
-            <span className="username">{user?.username}</span>
-            <span className="level">Lv.{user?.level}</span>
-          </div>
-          <div className="currency">
-            <span className="gems">
-              💎 {user?.currency?.gems?.toLocaleString()}
-            </span>
-            <span className="coins">
-              🪙 {user?.currency?.coins?.toLocaleString()}
-            </span>
-          </div>
-        </div>
-      </div>
 
-      <div className="inventory-controls">
-        <div className="inventory-tabs">
-          <button
-            className={`tab ${activeTab === "all" ? "active" : ""}`}
-            onClick={() => setActiveTab("all")}
-          >
-            All ({tabCounts.all})
-          </button>
-          <button
-            className={`tab ${activeTab === "characters" ? "active" : ""}`}
-            onClick={() => setActiveTab("characters")}
-          >
-            Characters ({tabCounts.characters})
-          </button>
-          <button
-            className={`tab ${activeTab === "pets" ? "active" : ""}`}
-            onClick={() => setActiveTab("pets")}
-          >
-            Pets ({tabCounts.pets})
-          </button>
-          <button
-            className={`tab ${activeTab === "items" ? "active" : ""}`}
-            onClick={() => setActiveTab("items")}
-          >
-            Items ({tabCounts.items})
-          </button>
-          <button
-            className={`tab ${activeTab === "equipments" ? "active" : ""}`}
-            onClick={() => setActiveTab("equipments")}
-          >
-            Equipments ({tabCounts.equipments})
-          </button>
-        </div>
-
-        <div className="view-controls">
-          <div className="view-mode-buttons">
+        <div className="inventory-controls">
+          <div className="inventory-tabs">
             <button
-              className={`view-mode-btn ${viewMode === "grid" ? "active" : ""}`}
-              onClick={() => setViewMode("grid")}
-              title="Grid View"
+              className={`tab ${activeTab === "all" ? "active" : ""}`}
+              onClick={() => setActiveTab("all")}
             >
-              ⊞
+              All ({tabCounts.all})
             </button>
             <button
-              className={`view-mode-btn ${
-                viewMode === "large-grid" ? "active" : ""
-              }`}
-              onClick={() => setViewMode("large-grid")}
-              title="Large Grid View"
+              className={`tab ${activeTab === "characters" ? "active" : ""}`}
+              onClick={() => setActiveTab("characters")}
             >
-              ⊡
+              Characters ({tabCounts.characters})
             </button>
             <button
-              className={`view-mode-btn ${viewMode === "list" ? "active" : ""}`}
-              onClick={() => setViewMode("list")}
-              title="List View"
+              className={`tab ${activeTab === "pets" ? "active" : ""}`}
+              onClick={() => setActiveTab("pets")}
             >
-              ☰
+              Pets ({tabCounts.pets})
+            </button>
+            <button
+              className={`tab ${activeTab === "items" ? "active" : ""}`}
+              onClick={() => setActiveTab("items")}
+            >
+              Items ({tabCounts.items})
+            </button>
+            <button
+              className={`tab ${activeTab === "equipments" ? "active" : ""}`}
+              onClick={() => setActiveTab("equipments")}
+            >
+              Equipments ({tabCounts.equipments})
             </button>
           </div>
 
-          <button
-            className={`filter-toggle-btn ${showFilters ? "active" : ""}`}
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            🔍 Filters
-          </button>
-        </div>
-      </div>
+          <div className="view-controls">
+            <div className="view-mode-buttons">
+              <button
+                className={`view-mode-btn ${
+                  viewMode === "grid" ? "active" : ""
+                }`}
+                onClick={() => setViewMode("grid")}
+                title="Grid View"
+              >
+                ⊞
+              </button>
+              <button
+                className={`view-mode-btn ${
+                  viewMode === "large-grid" ? "active" : ""
+                }`}
+                onClick={() => setViewMode("large-grid")}
+                title="Large Grid View"
+              >
+                ⊡
+              </button>
+              <button
+                className={`view-mode-btn ${
+                  viewMode === "list" ? "active" : ""
+                }`}
+                onClick={() => setViewMode("list")}
+                title="List View"
+              >
+                ☰
+              </button>
+            </div>
 
-      {renderFilterPanel()}
-
-      <div className="inventory-content">
-        {!inventory ? (
-          <div className="empty-inventory">
-            <p>No inventory data available</p>
+            <button
+              className={`filter-toggle-btn ${showFilters ? "active" : ""}`}
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              🔍 Filters
+            </button>
           </div>
-        ) : (
-          <div
-            className={`inventory-grid ${
-              viewMode === "large-grid" ? "large-grid-view" : ""
-            } ${viewMode === "list" ? "list-view" : ""}`}
-          >
-            {activeTab === "all" && (
-              <>
-                {filteredData.characters.map((item) =>
+        </div>
+
+        {renderFilterPanel()}
+
+        <div className="inventory-content">
+          {!inventory ? (
+            <div className="empty-inventory">
+              <p>No inventory data available</p>
+            </div>
+          ) : (
+            <div
+              className={`inventory-grid ${
+                viewMode === "large-grid" ? "large-grid-view" : ""
+              } ${viewMode === "list" ? "list-view" : ""}`}
+            >
+              {activeTab === "all" && (
+                <>
+                  {filteredData.characters.map((item) =>
+                    renderInventoryItem(item, "character")
+                  )}
+                  {filteredData.pets.map((item) =>
+                    renderInventoryItem(item, "pet")
+                  )}
+                  {filteredData.items.map((item) =>
+                    renderInventoryItem(item, "item")
+                  )}
+                  {filteredData.equipments.map((item) =>
+                    renderInventoryItem(item, "equipment")
+                  )}
+                </>
+              )}
+              {activeTab === "characters" &&
+                filteredData.characters.map((item) =>
                   renderInventoryItem(item, "character")
                 )}
-                {filteredData.pets.map((item) =>
+              {activeTab === "pets" &&
+                filteredData.pets.map((item) =>
                   renderInventoryItem(item, "pet")
                 )}
-                {filteredData.items.map((item) =>
+              {activeTab === "items" &&
+                filteredData.items.map((item) =>
                   renderInventoryItem(item, "item")
                 )}
-                {filteredData.equipments.map((item) =>
+              {activeTab === "equipments" &&
+                filteredData.equipments.map((item) =>
                   renderInventoryItem(item, "equipment")
                 )}
-              </>
-            )}
-            {activeTab === "characters" &&
-              filteredData.characters.map((item) =>
-                renderInventoryItem(item, "character")
-              )}
-            {activeTab === "pets" &&
-              filteredData.pets.map((item) => renderInventoryItem(item, "pet"))}
-            {activeTab === "items" &&
-              filteredData.items.map((item) =>
-                renderInventoryItem(item, "item")
-              )}
-            {activeTab === "equipments" &&
-              filteredData.equipments.map((item) =>
-                renderInventoryItem(item, "equipment")
-              )}
-          </div>
-        )}
-
-        {inventory &&
-          ((activeTab === "all" && tabCounts.all === 0) ||
-            (activeTab === "characters" && tabCounts.characters === 0) ||
-            (activeTab === "pets" && tabCounts.pets === 0) ||
-            (activeTab === "items" && tabCounts.items === 0) ||
-            (activeTab === "equipments" && tabCounts.equipments === 0)) && (
-            <div className="empty-inventory">
-              <p>No items match your current filters</p>
-              <p>Try adjusting your filter settings</p>
             </div>
           )}
+
+          {inventory &&
+            ((activeTab === "all" && tabCounts.all === 0) ||
+              (activeTab === "characters" && tabCounts.characters === 0) ||
+              (activeTab === "pets" && tabCounts.pets === 0) ||
+              (activeTab === "items" && tabCounts.items === 0) ||
+              (activeTab === "equipments" && tabCounts.equipments === 0)) && (
+              <div className="empty-inventory">
+                <p>No items match your current filters</p>
+                <p>Try adjusting your filter settings</p>
+              </div>
+            )}
+        </div>
+
+        {/* Item Detail Modal */}
+        <InventoryModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          itemId={selectedItemId}
+          itemType={selectedItemType}
+        />
       </div>
     </div>
   );

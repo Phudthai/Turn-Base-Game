@@ -14,7 +14,11 @@ export class InventoryController {
 
       const currentUser = await UserService.findUserById(user.id);
       if (!currentUser) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
       }
 
       // Get user's characters, pets, and items from normalized tables
@@ -105,59 +109,71 @@ export class InventoryController {
       });
 
       return {
-        characters: userCharacters.map((char) => {
-          // Calculate power level manually since it's a virtual property
-          const stats = char.currentStats;
-          const powerLevel = Math.floor(
-            stats.hp * 0.3 +
-              stats.attack * 0.4 +
-              stats.defense * 0.2 +
-              stats.speed * 0.1
-          );
+        success: true,
+        data: {
+          characters: userCharacters.map((char) => {
+            // Calculate power level manually since it's a virtual property
+            const stats = char.currentStats;
+            const powerLevel = Math.floor(
+              stats.hp * 0.3 +
+                stats.attack * 0.4 +
+                stats.defense * 0.2 +
+                stats.speed * 0.1
+            );
 
-          // Get rarity and name from character template
-          const template = characterTemplateMap.get(char.characterId);
-          const rarity = template?.rarity || "R";
-          const name = template?.name || char.characterId;
+            // Get rarity and name from character template
+            const template = characterTemplateMap.get(char.characterId);
+            const rarity = template?.rarity || "R";
+            const name = template?.name || char.characterId;
 
-          return {
-            id: char.characterId,
-            _id: char._id.toString(),
-            name: name,
-            level: char.level,
-            experience: char.experience,
-            powerLevel: powerLevel,
-            rarity: rarity,
-            isFavorite: char.metadata.isFavorite,
-            isLocked: char.metadata.isLocked,
-            obtainedAt: char.metadata.obtainedAt,
-          };
-        }),
-        pets: userPets.map((pet) => {
-          // Get rarity and name from pet template
-          const template = petTemplateMap.get(pet.petId);
-          const rarity = template?.rarity || "R";
-          const name = template?.name || pet.petId;
+            return {
+              id: char.characterId,
+              _id: char._id.toString(),
+              name: name,
+              level: char.level,
+              experience: char.experience,
+              powerLevel: powerLevel,
+              rarity: rarity,
+              isFavorite: char.metadata.isFavorite,
+              isLocked: char.metadata.isLocked,
+              obtainedAt: char.metadata.obtainedAt,
+            };
+          }),
+          pets: userPets.map((pet) => {
+            // Get rarity and name from pet template
+            const template = petTemplateMap.get(pet.petId);
+            const rarity = template?.rarity || "R";
+            const name = template?.name || pet.petId;
 
-          return {
-            id: pet.petId,
-            name: name,
-            level: pet.level,
-            experience: pet.experience,
-            rarity: rarity,
-            isActive: pet.metadata.isActive,
-            isFavorite: pet.metadata.isFavorite,
-            isLocked: pet.metadata.isLocked,
-            obtainedAt: pet.metadata.obtainedAt,
-          };
-        }),
-        items: items,
-        equipments: equipments,
-        total: userCharacters.length + userPets.length + items.length + equipments.length,
+            return {
+              id: pet.petId,
+              name: name,
+              level: pet.level,
+              experience: pet.experience,
+              rarity: rarity,
+              isActive: pet.metadata.isActive,
+              isFavorite: pet.metadata.isFavorite,
+              isLocked: pet.metadata.isLocked,
+              obtainedAt: pet.metadata.obtainedAt,
+            };
+          }),
+          items: items,
+          equipments: equipments,
+          total:
+            userCharacters.length +
+            userPets.length +
+            items.length +
+            equipments.length,
+        },
       };
     } catch (error) {
       console.error("Error getting user inventory:", error);
-      throw error;
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Failed to get inventory",
+        data: null,
+      };
     }
   }
 
@@ -165,40 +181,52 @@ export class InventoryController {
     try {
       const currentUser = await UserService.findUserById(user.id);
       if (!currentUser) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
       }
 
       const characters = await CharacterService.getUserCharacters(user.id);
 
       return {
-        characters: characters.map((char) => {
-          // Calculate power level manually since it's a virtual property
-          const stats = char.currentStats;
-          const powerLevel = Math.floor(
-            stats.hp * 0.3 +
-              stats.attack * 0.4 +
-              stats.defense * 0.2 +
-              stats.speed * 0.1
-          );
+        success: true,
+        data: {
+          characters: characters.map((char) => {
+            // Calculate power level manually since it's a virtual property
+            const stats = char.currentStats;
+            const powerLevel = Math.floor(
+              stats.hp * 0.3 +
+                stats.attack * 0.4 +
+                stats.defense * 0.2 +
+                stats.speed * 0.1
+            );
 
-          return {
-            id: char._id,
-            characterId: char.characterId,
-            level: char.level,
-            experience: char.experience,
-            currentStats: char.currentStats,
-            powerLevel: powerLevel,
-            evolution: char.evolution,
-            equipments: char.equipments,
-            battleStats: char.battleStats,
-            metadata: char.metadata,
-          };
-        }),
-        total: characters.length,
+            return {
+              id: char._id,
+              characterId: char.characterId,
+              level: char.level,
+              experience: char.experience,
+              currentStats: char.currentStats,
+              powerLevel: powerLevel,
+              evolution: char.evolution,
+              equipments: char.equipments,
+              battleStats: char.battleStats,
+              metadata: char.metadata,
+            };
+          }),
+          total: characters.length,
+        },
       };
     } catch (error) {
       console.error("Error getting user characters:", error);
-      throw error;
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Failed to get characters",
+        data: null,
+      };
     }
   }
 
@@ -206,29 +234,40 @@ export class InventoryController {
     try {
       const currentUser = await UserService.findUserById(user.id);
       if (!currentUser) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
       }
 
       const pets = await PetService.getUserPets(user.id);
 
       return {
-        pets: pets.map((pet) => ({
-          id: pet._id,
-          petId: pet.petId,
-          level: pet.level,
-          experience: pet.experience,
-          currentStats: pet.currentStats,
-          skillLevels: pet.skillLevels,
-          evolution: pet.evolution,
-          bonusEffects: pet.bonusEffects,
-          battleStats: pet.battleStats,
-          metadata: pet.metadata,
-        })),
-        total: pets.length,
+        success: true,
+        data: {
+          pets: pets.map((pet) => ({
+            id: pet._id,
+            petId: pet.petId,
+            level: pet.level,
+            experience: pet.experience,
+            currentStats: pet.currentStats,
+            skillLevels: pet.skillLevels,
+            evolution: pet.evolution,
+            bonusEffects: pet.bonusEffects,
+            battleStats: pet.battleStats,
+            metadata: pet.metadata,
+          })),
+          total: pets.length,
+        },
       };
     } catch (error) {
       console.error("Error getting user pets:", error);
-      throw error;
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to get pets",
+        data: null,
+      };
     }
   }
 
@@ -236,7 +275,11 @@ export class InventoryController {
     try {
       const currentUser = await UserService.findUserById(user.id);
       if (!currentUser) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
       }
 
       const itemsWithTemplates = await ItemService.getUserItemsWithTemplates(
@@ -244,25 +287,32 @@ export class InventoryController {
       );
 
       return {
-        items: itemsWithTemplates.map(({ userItem, template }) => ({
-          id: userItem._id,
-          itemId: userItem.itemId,
-          name: template?.name || "Unknown Item",
-          description: template?.description || "",
-          rarity: template?.rarity || "R",
-          type: template?.type || "other",
-          quantity: userItem.quantity,
-          stackLimit: template?.stackLimit || 999,
-          sellPrice: template?.sellPrice || 0,
-          tradeable: template?.tradeable || false,
-          artwork: template?.artwork || { icon: "", thumbnail: "" },
-          metadata: userItem.metadata,
-        })),
-        total: itemsWithTemplates.length,
+        success: true,
+        data: {
+          items: itemsWithTemplates.map(({ userItem, template }) => ({
+            id: userItem._id,
+            itemId: userItem.itemId,
+            name: template?.name || "Unknown Item",
+            description: template?.description || "",
+            rarity: template?.rarity || "R",
+            type: template?.type || "other",
+            quantity: userItem.quantity,
+            stackLimit: template?.stackLimit || 999,
+            sellPrice: template?.sellPrice || 0,
+            tradeable: template?.tradeable || false,
+            artwork: template?.artwork || { icon: "", thumbnail: "" },
+            metadata: userItem.metadata,
+          })),
+          total: itemsWithTemplates.length,
+        },
       };
     } catch (error) {
       console.error("Error getting user items:", error);
-      throw error;
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to get items",
+        data: null,
+      };
     }
   }
 
@@ -437,15 +487,34 @@ export class InventoryController {
     try {
       const currentUser = await UserService.findUserById(user.id);
       if (!currentUser) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
       }
 
-      const userCharacter = await CharacterService.getUserCharacterById(
-        user.id,
-        characterId
+      // Get all user characters
+      const userCharacters = await CharacterService.getUserCharacters(user.id);
+
+      // Find character by _id or characterId
+      let userCharacter = userCharacters.find(
+        (char) => char._id.toString() === characterId
       );
+
+      // If not found by _id, try to find by characterId
       if (!userCharacter) {
-        throw new Error("Character not found");
+        userCharacter = userCharacters.find(
+          (char) => char.characterId === characterId
+        );
+      }
+
+      if (!userCharacter) {
+        return {
+          success: false,
+          message: "Character not found in your inventory",
+          data: null,
+        };
       }
 
       // Get character template for full info
@@ -463,42 +532,52 @@ export class InventoryController {
       );
 
       return {
-        character: {
-          id: userCharacter._id.toString(),
-          characterId: userCharacter.characterId,
-          name: template?.name || userCharacter.characterId,
-          description: template?.lore || "",
-          rarity: template?.rarity || "R",
-          level: userCharacter.level,
-          experience: userCharacter.experience,
-          currentStats: userCharacter.currentStats,
-          powerLevel: powerLevel,
-          evolution: userCharacter.evolution,
-          equipments: userCharacter.equipments,
-          battleStats: userCharacter.battleStats,
-          skills: template?.skills || [],
-          artwork: template?.artwork || {
-            icon: "👤",
-            thumbnail: "👤",
-            fullImage: "👤",
+        success: true,
+        data: {
+          character: {
+            id: userCharacter._id.toString(),
+            characterId: userCharacter.characterId,
+            name: template?.name || userCharacter.characterId,
+            description: template?.lore || "",
+            rarity: template?.rarity || "R",
+            level: userCharacter.level,
+            experience: userCharacter.experience,
+            currentStats: userCharacter.currentStats,
+            powerLevel: powerLevel,
+            evolution: userCharacter.evolution,
+            equipments: userCharacter.equipments,
+            battleStats: userCharacter.battleStats,
+            skills: template?.skills || [],
+            artwork: template?.artwork || {
+              icon: "👤",
+              thumbnail: "👤",
+              fullImage: "👤",
+            },
+            metadata: {
+              ...userCharacter.metadata,
+              obtainedAt: userCharacter.metadata.obtainedAt.toISOString(),
+            },
+            template: template
+              ? {
+                  baseStats: template.baseStats,
+                  growthRates: template.growthRates,
+                  maxLevel: template.maxLevel,
+                  element: template.element,
+                }
+              : null,
           },
-          metadata: {
-            ...userCharacter.metadata,
-            obtainedAt: userCharacter.metadata.obtainedAt.toISOString(),
-          },
-          template: template
-            ? {
-                baseStats: template.baseStats,
-                growthRates: template.growthRates,
-                maxLevel: template.maxLevel,
-                element: template.element,
-              }
-            : null,
         },
       };
     } catch (error) {
       console.error("Error getting character detail:", error);
-      throw error;
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to get character detail",
+        data: null,
+      };
     }
   }
 
@@ -506,53 +585,179 @@ export class InventoryController {
     try {
       const currentUser = await UserService.findUserById(user.id);
       if (!currentUser) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
       }
 
-      // Find user pet by _id instead of petId
-      const userPet = await PetService.getPetWithTemplate(petId);
+      // Get all user pets
+      const userPets = await PetService.getUserPets(user.id);
+
+      // Find pet by _id or petId
+      let userPet = userPets.find((pet) => pet._id.toString() === petId);
+
+      // If not found by _id, try to find by petId
       if (!userPet) {
-        throw new Error("Pet not found");
+        userPet = userPets.find((pet) => pet.petId === petId);
       }
+
+      if (!userPet) {
+        return {
+          success: false,
+          message: "Pet not found in your inventory",
+          data: null,
+        };
+      }
+
+      // Get pet template for full info
+      const template = await PetService.getPetById(userPet.petId);
 
       return {
-        pet: {
-          id: userPet.userPet._id.toString(),
-          petId: userPet.userPet.petId,
-          name: userPet.template?.name || userPet.userPet.petId,
-          description: userPet.template?.lore || "",
-          rarity: userPet.template?.rarity || "R",
-          level: userPet.userPet.level,
-          experience: userPet.userPet.experience,
-          currentStats: userPet.userPet.currentStats,
-          skillLevels: userPet.userPet.skillLevels,
-          evolution: userPet.userPet.evolution,
-          bonusEffects: userPet.userPet.bonusEffects,
-          battleStats: userPet.userPet.battleStats,
-          skills: userPet.template?.skills || [],
-          artwork: userPet.template?.artwork || {
-            icon: "🐾",
-            thumbnail: "🐾",
-            fullImage: "🐾",
+        success: true,
+        data: {
+          pet: {
+            id: userPet._id.toString(),
+            petId: userPet.petId,
+            name: template?.name || userPet.petId,
+            description: template?.lore || "",
+            rarity: template?.rarity || "R",
+            level: userPet.level,
+            experience: userPet.experience,
+            currentStats: userPet.currentStats,
+            skillLevels: userPet.skillLevels,
+            evolution: userPet.evolution,
+            bonusEffects: userPet.bonusEffects,
+            battleStats: userPet.battleStats,
+            skills: template?.skills || [],
+            artwork: template?.artwork || {
+              icon: "🐾",
+              thumbnail: "🐾",
+              fullImage: "🐾",
+            },
+            metadata: {
+              ...userPet.metadata,
+              obtainedAt: userPet.metadata.obtainedAt.toISOString(),
+            },
+            template: template
+              ? {
+                  baseStats: template.baseStats,
+                  bonuses: template.bonuses,
+                  maxLevel: template.maxLevel,
+                  element: template.element,
+                  petType: template.petType,
+                }
+              : null,
           },
-          metadata: {
-            ...userPet.userPet.metadata,
-            obtainedAt: userPet.userPet.metadata.obtainedAt.toISOString(),
-          },
-          template: userPet.template
-            ? {
-                baseStats: userPet.template.baseStats,
-                bonuses: userPet.template.bonuses,
-                maxLevel: userPet.template.maxLevel,
-                element: userPet.template.element,
-                petType: userPet.template.petType,
-              }
-            : null,
         },
       };
     } catch (error) {
       console.error("Error getting pet detail:", error);
-      throw error;
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Failed to get pet detail",
+        data: null,
+      };
+    }
+  }
+
+  static async getEquipmentDetail({
+    user,
+    equipmentId,
+  }: {
+    user: any;
+    equipmentId: string;
+  }) {
+    try {
+      const currentUser = await UserService.findUserById(user.id);
+      if (!currentUser) {
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
+      }
+
+      // Get all user equipments
+      const userEquipments = await EquipmentService.getUserEquipments(user.id);
+
+      // Find equipment by _id or equipmentId
+      let userEquipment = userEquipments.find(
+        (eq) => eq._id.toString() === equipmentId
+      );
+
+      // If not found by _id, try to find by equipmentId
+      if (!userEquipment) {
+        userEquipment = userEquipments.find(
+          (eq) => eq.equipmentId === equipmentId
+        );
+      }
+
+      if (!userEquipment) {
+        return {
+          success: false,
+          message: "Equipment not found in your inventory",
+          data: null,
+        };
+      }
+
+      // Get equipment template for full info
+      const template = await Equipment.findOne({
+        id: userEquipment.equipmentId,
+      });
+
+      return {
+        success: true,
+        data: {
+          equipment: {
+            id: userEquipment._id.toString(),
+            equipmentId: userEquipment.equipmentId,
+            name: template?.name || userEquipment.equipmentId,
+            description: template?.description || "",
+            rarity: template?.rarity || "R",
+            type: template?.type || "weapon",
+            subType: template?.subType || "sword",
+            enhancementLevel: userEquipment.enhancementLevel,
+            isLocked: userEquipment.isLocked,
+            equippedTo: userEquipment.equippedTo,
+            equippedSlot: userEquipment.equippedSlot,
+            baseStats: template?.baseStats || {},
+            allowedClasses: template?.allowedClasses || [],
+            artwork: template?.artwork || {
+              icon: "⚔️",
+              thumbnail: "⚔️",
+              fullImage: "⚔️",
+            },
+            metadata: {
+              obtainedAt:
+                userEquipment.obtainedAt?.toISOString() ||
+                new Date().toISOString(),
+              obtainedFrom: userEquipment.obtainedFrom || "Unknown",
+              isLocked: userEquipment.isLocked,
+            },
+            template: template
+              ? {
+                  baseStats: template.baseStats,
+                  requirements: template.requirements,
+                  maxEnhancement: template.maxEnhancement || 20,
+                  enhancementCost: template.enhancementCost,
+                }
+              : null,
+          },
+        },
+      };
+    } catch (error) {
+      console.error("Error getting equipment detail:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to get equipment detail",
+        data: null,
+      };
     }
   }
 
@@ -560,50 +765,71 @@ export class InventoryController {
     try {
       const currentUser = await UserService.findUserById(user.id);
       if (!currentUser) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          message: "User not found",
+          data: null,
+        };
       }
 
-      // Find user item by _id
-      const userItem = await ItemService.getUserItems(user.id);
-      const targetUserItem = userItem.find(
+      // Find user item by _id or itemId
+      const userItems = await ItemService.getUserItems(user.id);
+      let targetUserItem = userItems.find(
         (item) => item._id.toString() === itemId
       );
 
+      // If not found by _id, try to find by itemId
       if (!targetUserItem) {
-        throw new Error("Item not found");
+        targetUserItem = userItems.find((item) => item.itemId === itemId);
+      }
+
+      if (!targetUserItem) {
+        return {
+          success: false,
+          message: "Item not found in your inventory",
+          data: null,
+        };
       }
 
       // Get item template for full info
       const template = await ItemService.getItemById(targetUserItem.itemId);
 
       return {
-        item: {
-          id: targetUserItem._id.toString(),
-          itemId: targetUserItem.itemId,
-          name: template?.name || "Unknown Item",
-          description: template?.description || "",
-          rarity: template?.rarity || "R",
-          type: template?.type || "consumable",
-          subType: template?.subType || "other",
-          quantity: targetUserItem.quantity,
-          stackLimit: template?.stackLimit || 999,
-          sellPrice: template?.sellPrice || 0,
-          tradeable: template?.tradeable || false,
-          effects: template?.effects || [],
-          artwork: template?.artwork || {
-            icon: "📦",
-            thumbnail: "📦",
-            fullImage: "📦",
-          },
-          metadata: {
-            ...targetUserItem.metadata,
-            obtainedAt: targetUserItem.metadata.obtainedAt.toISOString(),
+        success: true,
+        data: {
+          item: {
+            id: targetUserItem._id.toString(),
+            itemId: targetUserItem.itemId,
+            name: template?.name || "Unknown Item",
+            description: template?.description || "",
+            rarity: template?.rarity || "R",
+            type: template?.type || "consumable",
+            subType: template?.subType || "other",
+            quantity: targetUserItem.quantity,
+            stackLimit: template?.stackLimit || 999,
+            sellPrice: template?.sellPrice || 0,
+            tradeable: template?.tradeable || false,
+            effects: template?.effects || [],
+            artwork: template?.artwork || {
+              icon: "📦",
+              thumbnail: "📦",
+              fullImage: "📦",
+            },
+            metadata: {
+              ...targetUserItem.metadata,
+              obtainedAt: targetUserItem.metadata.obtainedAt.toISOString(),
+            },
           },
         },
       };
     } catch (error) {
       console.error("Error getting item detail:", error);
-      throw error;
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Failed to get item detail",
+        data: null,
+      };
     }
   }
 }

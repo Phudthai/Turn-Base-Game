@@ -103,7 +103,7 @@ export const useGameAPI = () => {
       setIsLoading(true);
       setError(null);
       try {
-        return await inventoryAPI.getInventory(token);
+        return await inventoryAPI.getUserInventory(token);
       } catch (err: any) {
         setError(err.message || "Failed to get inventory");
         return null;

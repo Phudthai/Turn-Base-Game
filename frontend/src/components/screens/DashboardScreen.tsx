@@ -1,7 +1,18 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
 
-export type GameState = "dashboard" | "gacha" | "battle" | "inventory";
+export type GameState =
+  | "lobby"
+  | "dashboard"
+  | "gacha"
+  | "battle"
+  | "inventory"
+  | "shop"
+  | "guild"
+  | "dungeon"
+  | "pvp"
+  | "events"
+  | "settings";
 
 interface DashboardScreenProps {
   onNavigate: (state: GameState) => void;

@@ -168,38 +168,23 @@ export const gameAPI = {
 // Inventory API services
 export const inventoryAPI = {
   getUserInventory: async (token: string): Promise<any> => {
-    return apiRequest<any>(API_ENDPOINTS.GAME.INVENTORY, {
+    const response = await apiRequest<any>(API_ENDPOINTS.GAME.INVENTORY, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get inventory");
+    }
   },
 
   getCharacters: async (token: string): Promise<any> => {
-    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/characters`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  },
-
-  getCharactersGrid: async (token: string): Promise<any> => {
-    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/grid/characters`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  },
-
-  getCharacterDetail: async (
-    token: string,
-    characterId: string
-  ): Promise<any> => {
-    return apiRequest<any>(
-      `${API_ENDPOINTS.GAME.INVENTORY}/character/${characterId}`,
+    const response = await apiRequest<any>(
+      `${API_ENDPOINTS.GAME.INVENTORY}/characters`,
       {
         method: "GET",
         headers: {
@@ -207,52 +192,133 @@ export const inventoryAPI = {
         },
       }
     );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get characters");
+    }
+  },
+
+  getCharactersGrid: async (token: string): Promise<any> => {
+    const response = await apiRequest<any>(
+      `${API_ENDPOINTS.GAME.INVENTORY}/grid/characters`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get characters grid");
+    }
+  },
+
+  getCharacterDetail: async (
+    token: string,
+    characterId: string
+  ): Promise<any> => {
+    const response = await apiRequest<any>(
+      `${API_ENDPOINTS.GAME.INVENTORY}/character/${characterId}`,
+      {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      }
+    );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get character detail");
+    }
   },
 
   getPets: async (token: string): Promise<any> => {
-    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/pets`, {
+    const response = await apiRequest<any>(
+      `${API_ENDPOINTS.GAME.INVENTORY}/pets`,
+      {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
+      }
+    );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get pets");
+    }
   },
 
   getItems: async (token: string): Promise<any> => {
-    return apiRequest<any>(`${API_ENDPOINTS.GAME.INVENTORY}/items`, {
+    const response = await apiRequest<any>(
+      `${API_ENDPOINTS.GAME.INVENTORY}/items`,
+      {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
+      }
+    );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get items");
+    }
   },
 
   // NEW: Grid View APIs (Compact Data)
   getInventoryGrid: async (token: string): Promise<InventoryGridResponse> => {
-    return apiRequest<InventoryGridResponse>(API_ENDPOINTS.INVENTORY.GRID, {
+    const response = await apiRequest<any>(API_ENDPOINTS.INVENTORY.GRID, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get inventory grid");
+    }
   },
 
   getPetsGrid: async (token: string): Promise<any> => {
-    return apiRequest<any>(API_ENDPOINTS.INVENTORY.GRID_PETS, {
+    const response = await apiRequest<any>(API_ENDPOINTS.INVENTORY.GRID_PETS, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get pets grid");
+    }
   },
 
   getItemsGrid: async (token: string): Promise<any> => {
-    return apiRequest<any>(API_ENDPOINTS.INVENTORY.GRID_ITEMS, {
+    const response = await apiRequest<any>(API_ENDPOINTS.INVENTORY.GRID_ITEMS, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get items grid");
+    }
   },
 
   // NEW: Detail View APIs (Full Data)
@@ -260,7 +326,7 @@ export const inventoryAPI = {
     token: string,
     petId: string
   ): Promise<PetDetailResponse> => {
-    return apiRequest<PetDetailResponse>(
+    const response = await apiRequest<any>(
       `${API_ENDPOINTS.INVENTORY.PET_DETAIL}/${petId}`,
       {
         method: "GET",
@@ -269,13 +335,19 @@ export const inventoryAPI = {
         },
       }
     );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get pet detail");
+    }
   },
 
   getItemDetail: async (
     token: string,
     itemId: string
   ): Promise<ItemDetailResponse> => {
-    return apiRequest<ItemDetailResponse>(
+    const response = await apiRequest<any>(
       `${API_ENDPOINTS.INVENTORY.ITEM_DETAIL}/${itemId}`,
       {
         method: "GET",
@@ -284,6 +356,33 @@ export const inventoryAPI = {
         },
       }
     );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get item detail");
+    }
+  },
+
+  getEquipmentDetail: async (
+    token: string,
+    equipmentId: string
+  ): Promise<any> => {
+    const response = await apiRequest<any>(
+      `${API_ENDPOINTS.INVENTORY.EQUIPMENT_DETAIL}/${equipmentId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.message || "Failed to get equipment detail");
+    }
   },
 };
 

@@ -37,6 +37,12 @@ export const inventoryRoutes = new Elysia({ prefix: "/inventory" })
   .get("/pet/:id", async ({ user, params }) => {
     return InventoryController.getPetDetail({ user, petId: params.id });
   })
+  .get("/equipment/:id", async ({ user, params }) => {
+    return InventoryController.getEquipmentDetail({
+      user,
+      equipmentId: params.id,
+    });
+  })
   .get("/item/:id", async ({ user, params }) => {
     return InventoryController.getItemDetail({ user, itemId: params.id });
   });

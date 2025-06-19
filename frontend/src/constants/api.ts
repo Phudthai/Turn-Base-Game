@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     GACHA_PULL: `${API_BASE_URL}/gacha/pull`,
     GACHA_BANNERS: `${API_BASE_URL}/gacha/banners`,
     BATTLE: `${API_BASE_URL}/battle`,
+    INVENTORY: `${API_BASE_URL}/inventory`,
   },
   INVENTORY: {
     BASE: `${API_BASE_URL}/inventory`,
@@ -26,6 +27,7 @@ export const API_ENDPOINTS = {
     GRID_ITEMS: `${API_BASE_URL}/inventory/grid/items`,
     CHARACTER_DETAIL: `${API_BASE_URL}/inventory/character`,
     PET_DETAIL: `${API_BASE_URL}/inventory/pet`,
+    EQUIPMENT_DETAIL: `${API_BASE_URL}/inventory/equipment`,
     ITEM_DETAIL: `${API_BASE_URL}/inventory/item`,
   },
   DATA: {

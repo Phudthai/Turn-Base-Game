@@ -2459,6 +2459,395 @@ export class DataController {
           lore: "A charm blessed by village healers",
           tradeable: true,
         },
+        // Additional Equipment Templates for more variety
+        // More SSR Equipment
+        {
+          id: "weapon_006",
+          name: "Moonlight Blade",
+          description: "A blade that glows with ethereal moonlight",
+          rarity: "SSR",
+          type: "weapon",
+          subType: "sword",
+          allowedClasses: ["warrior", "assassin"],
+          baseStats: {
+            hp: 150,
+            attack: 165,
+            defense: 40,
+            speed: 35,
+            critRate: 18,
+            critDamage: 45,
+          },
+          enhancementLevels: {
+            maxLevel: 20,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_006", quantity: 2 },
+                  { itemId: "item_016", quantity: 1200 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/moonlight_blade_icon.png",
+            preview: "/images/equipment/moonlight_blade_preview.png",
+          },
+          lore: "Forged under a blood moon by celestial smiths",
+          tradeable: false,
+        },
+        {
+          id: "weapon_007",
+          name: "Phoenix Staff",
+          description: "A staff containing the power of a reborn phoenix",
+          rarity: "SSR",
+          type: "weapon",
+          subType: "staff",
+          allowedClasses: ["mage", "healer"],
+          baseStats: {
+            hp: 120,
+            attack: 175,
+            defense: 35,
+            speed: 25,
+            critRate: 16,
+            critDamage: 38,
+          },
+          enhancementLevels: {
+            maxLevel: 20,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_006", quantity: 2 },
+                  { itemId: "item_016", quantity: 1100 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/phoenix_staff_icon.png",
+            preview: "/images/equipment/phoenix_staff_preview.png",
+          },
+          lore: "Contains the eternal flame of rebirth",
+          tradeable: false,
+        },
+        // More SR Equipment
+        {
+          id: "weapon_008",
+          name: "Crystal Bow",
+          description: "A bow carved from pure crystal that never misses",
+          rarity: "SR",
+          type: "weapon",
+          subType: "bow",
+          allowedClasses: ["archer"],
+          baseStats: {
+            hp: 90,
+            attack: 95,
+            defense: 25,
+            speed: 45,
+            critRate: 12,
+            critDamage: 28,
+          },
+          enhancementLevels: {
+            maxLevel: 15,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_011", quantity: 1 },
+                  { itemId: "item_016", quantity: 600 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/crystal_bow_icon.png",
+            preview: "/images/equipment/crystal_bow_preview.png",
+          },
+          lore: "Carved by master artisans from a single crystal",
+          tradeable: true,
+        },
+        {
+          id: "armor_004",
+          name: "Knight's Plate",
+          description: "Heavy armor worn by elite knights",
+          rarity: "SR",
+          type: "armor",
+          subType: "chestplate",
+          allowedClasses: ["warrior", "tank"],
+          baseStats: {
+            hp: 200,
+            attack: 15,
+            defense: 120,
+            speed: -10,
+            critRate: 0,
+            critDamage: 0,
+          },
+          enhancementLevels: {
+            maxLevel: 15,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_011", quantity: 2 },
+                  { itemId: "item_016", quantity: 700 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/knight_plate_icon.png",
+            preview: "/images/equipment/knight_plate_preview.png",
+          },
+          lore: "Forged for the kingdom's most trusted defenders",
+          tradeable: true,
+        },
+        {
+          id: "armor_005",
+          name: "Shadow Cloak",
+          description: "A cloak that grants stealth and agility",
+          rarity: "SR",
+          type: "armor",
+          subType: "chestplate",
+          allowedClasses: ["assassin", "archer"],
+          baseStats: {
+            hp: 100,
+            attack: 30,
+            defense: 60,
+            speed: 40,
+            critRate: 8,
+            critDamage: 20,
+          },
+          enhancementLevels: {
+            maxLevel: 15,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_011", quantity: 1 },
+                  { itemId: "item_016", quantity: 550 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/shadow_cloak_icon.png",
+            preview: "/images/equipment/shadow_cloak_preview.png",
+          },
+          lore: "Woven from shadows of the void",
+          tradeable: true,
+        },
+        {
+          id: "accessory_004",
+          name: "Dragon Eye Pendant",
+          description: "A pendant containing a real dragon's eye",
+          rarity: "SR",
+          type: "accessory",
+          subType: "necklace",
+          allowedClasses: [],
+          baseStats: {
+            hp: 80,
+            attack: 50,
+            defense: 30,
+            speed: 20,
+            critRate: 12,
+            critDamage: 25,
+          },
+          enhancementLevels: {
+            maxLevel: 15,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_011", quantity: 1 },
+                  { itemId: "item_016", quantity: 450 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/dragon_eye_icon.png",
+            preview: "/images/equipment/dragon_eye_preview.png",
+          },
+          lore: "The eye of an ancient dragon, still burning with power",
+          tradeable: true,
+        },
+        // More R Equipment
+        {
+          id: "weapon_009",
+          name: "Training Sword",
+          description: "A practice sword for new recruits",
+          rarity: "R",
+          type: "weapon",
+          subType: "sword",
+          allowedClasses: ["warrior", "tank"],
+          baseStats: {
+            hp: 40,
+            attack: 35,
+            defense: 10,
+            speed: 5,
+            critRate: 2,
+            critDamage: 8,
+          },
+          enhancementLevels: {
+            maxLevel: 10,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_023", quantity: 3 },
+                  { itemId: "item_016", quantity: 80 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/training_sword_icon.png",
+            preview: "/images/equipment/training_sword_preview.png",
+          },
+          lore: "Every warrior's first companion",
+          tradeable: true,
+        },
+        {
+          id: "weapon_010",
+          name: "Hunter's Bow",
+          description: "A simple bow used by forest hunters",
+          rarity: "R",
+          type: "weapon",
+          subType: "bow",
+          allowedClasses: ["archer"],
+          baseStats: {
+            hp: 30,
+            attack: 45,
+            defense: 5,
+            speed: 20,
+            critRate: 5,
+            critDamage: 12,
+          },
+          enhancementLevels: {
+            maxLevel: 10,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_023", quantity: 4 },
+                  { itemId: "item_016", quantity: 90 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/hunter_bow_icon.png",
+            preview: "/images/equipment/hunter_bow_preview.png",
+          },
+          lore: "Crafted from the finest forest wood",
+          tradeable: true,
+        },
+        {
+          id: "armor_006",
+          name: "Cloth Robe",
+          description: "Basic robes for aspiring mages",
+          rarity: "R",
+          type: "armor",
+          subType: "chestplate",
+          allowedClasses: ["mage", "healer"],
+          baseStats: {
+            hp: 60,
+            attack: 10,
+            defense: 25,
+            speed: 15,
+            critRate: 2,
+            critDamage: 5,
+          },
+          enhancementLevels: {
+            maxLevel: 10,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_023", quantity: 2 },
+                  { itemId: "item_016", quantity: 60 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/cloth_robe_icon.png",
+            preview: "/images/equipment/cloth_robe_preview.png",
+          },
+          lore: "Simple robes for magical beginners",
+          tradeable: true,
+        },
+        {
+          id: "accessory_005",
+          name: "Iron Ring",
+          description: "A simple iron ring with minor enchantments",
+          rarity: "R",
+          type: "accessory",
+          subType: "ring",
+          allowedClasses: [],
+          baseStats: {
+            hp: 30,
+            attack: 15,
+            defense: 10,
+            speed: 8,
+            critRate: 3,
+            critDamage: 8,
+          },
+          enhancementLevels: {
+            maxLevel: 10,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_023", quantity: 1 },
+                  { itemId: "item_016", quantity: 40 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/iron_ring_icon.png",
+            preview: "/images/equipment/iron_ring_preview.png",
+          },
+          lore: "A beginner's first magical accessory",
+          tradeable: true,
+        },
+        {
+          id: "accessory_006",
+          name: "Traveler's Boots",
+          description: "Comfortable boots for long journeys",
+          rarity: "R",
+          type: "accessory",
+          subType: "boots",
+          allowedClasses: [],
+          baseStats: {
+            hp: 40,
+            attack: 5,
+            defense: 15,
+            speed: 25,
+            critRate: 1,
+            critDamage: 3,
+          },
+          enhancementLevels: {
+            maxLevel: 10,
+            materials: [
+              {
+                level: 1,
+                requirements: [
+                  { itemId: "item_023", quantity: 2 },
+                  { itemId: "item_016", quantity: 50 },
+                ],
+              },
+            ],
+          },
+          artwork: {
+            icon: "/images/equipment/traveler_boots_icon.png",
+            preview: "/images/equipment/traveler_boots_preview.png",
+          },
+          lore: "Worn by countless adventurers across the lands",
+          tradeable: true,
+        },
       ];
 
       // Save all data

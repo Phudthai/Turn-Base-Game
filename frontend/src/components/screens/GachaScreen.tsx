@@ -295,101 +295,105 @@ export function GachaScreen({ onBack }: GachaScreenProps) {
       <button className="back-button" onClick={onBack}>
         ← Back
       </button>
-      <h2>🎰 Gacha Pull</h2>
 
-      {/* Banner Selection */}
-      <div className="banner-selection">
-        <h3>Select Banner</h3>
-        <div className="banner-list">
-          {banners.map((banner) => (
-            <div
-              key={banner.id}
-              className={`banner-card ${
-                selectedBanner === banner.id ? "selected" : ""
-              } ${banner.type}`}
-              onClick={() => setSelectedBanner(banner.id)}
-            >
-              <div className="banner-header">
-                <span className="banner-icon">
-                  {getBannerTypeIcon(banner.type)}
-                </span>
-                <h4>{banner.name}</h4>
-                {banner.type !== "standard" && (
-                  <span className="banner-type">
-                    {banner.type.toUpperCase()}
+      <div className="gacha-container">
+        <h2>🎰 Gacha Pull</h2>
+
+        {/* Banner Selection */}
+        <div className="banner-selection">
+          <h3>Select Banner</h3>
+          <div className="banner-list">
+            {banners.map((banner) => (
+              <div
+                key={banner.id}
+                className={`banner-card ${
+                  selectedBanner === banner.id ? "selected" : ""
+                } ${banner.type}`}
+                onClick={() => setSelectedBanner(banner.id)}
+              >
+                <div className="banner-header">
+                  <span className="banner-icon">
+                    {getBannerTypeIcon(banner.type)}
                   </span>
-                )}
-              </div>
-              <p className="banner-description">
-                {getBannerDescription(banner)}
-              </p>
-              <div className="banner-cost">
-                <span>
-                  💎 {banner.cost.amount} {banner.cost.currency}
-                </span>
-                {banner.cost.discount && (
-                  <span className="multi-cost">
-                    | 10x: 💎 {banner.cost.discount.multiPull}{" "}
-                    {banner.cost.currency}
-                  </span>
-                )}
-              </div>
-              {banner.duration && (
-                <div className="banner-duration">
-                  <small>
-                    Until: {new Date(banner.duration.end).toLocaleDateString()}
-                  </small>
+                  <h4>{banner.name}</h4>
+                  {banner.type !== "standard" && (
+                    <span className="banner-type">
+                      {banner.type.toUpperCase()}
+                    </span>
+                  )}
                 </div>
-              )}
+                <p className="banner-description">
+                  {getBannerDescription(banner)}
+                </p>
+                <div className="banner-cost">
+                  <span>
+                    💎 {banner.cost.amount} {banner.cost.currency}
+                  </span>
+                  {banner.cost.discount && (
+                    <span className="multi-cost">
+                      | 10x: 💎 {banner.cost.discount.multiPull}{" "}
+                      {banner.cost.currency}
+                    </span>
+                  )}
+                </div>
+                {banner.duration && (
+                  <div className="banner-duration">
+                    <small>
+                      Until:{" "}
+                      {new Date(banner.duration.end).toLocaleDateString()}
+                    </small>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="gacha-area">
+          {error && <div className="error-message">{error}</div>}
+
+          {/* Current Banner Info */}
+          {getCurrentBanner() && (
+            <div className="current-banner-info">
+              <h3>Current Banner: {getCurrentBanner()!.name}</h3>
+              <p>{getBannerDescription(getCurrentBanner()!)}</p>
             </div>
-          ))}
+          )}
+
+          <div className="gacha-buttons">
+            <div className="gacha-option">
+              <h4>Single Pull</h4>
+              <p>Pull one item</p>
+              <button
+                className="gacha-button single"
+                onClick={performSingleGacha}
+                disabled={isLoading}
+              >
+                {isLoading && pullType === "single"
+                  ? "Pulling..."
+                  : `Pull x1 (💎 ${getCurrentBanner()?.cost.amount || 160})`}
+              </button>
+            </div>
+
+            <div className="gacha-option">
+              <h4>Multi Pull</h4>
+              <p>Pull 10 items (guaranteed SR+!)</p>
+              <button
+                className="gacha-button multi"
+                onClick={performMultiGachaAction}
+                disabled={isLoading}
+              >
+                {isLoading && pullType === "multi"
+                  ? "Pulling..."
+                  : `Pull x10 (💎 ${
+                      getCurrentBanner()?.cost.discount?.multiPull || 1600
+                    })`}
+              </button>
+            </div>
+          </div>
+
+          {renderGachaResult()}
         </div>
-      </div>
-
-      <div className="gacha-area">
-        {error && <div className="error-message">{error}</div>}
-
-        {/* Current Banner Info */}
-        {getCurrentBanner() && (
-          <div className="current-banner-info">
-            <h3>Current Banner: {getCurrentBanner()!.name}</h3>
-            <p>{getBannerDescription(getCurrentBanner()!)}</p>
-          </div>
-        )}
-
-        <div className="gacha-buttons">
-          <div className="gacha-option">
-            <h4>Single Pull</h4>
-            <p>Pull one item</p>
-            <button
-              className="gacha-button single"
-              onClick={performSingleGacha}
-              disabled={isLoading}
-            >
-              {isLoading && pullType === "single"
-                ? "Pulling..."
-                : `Pull x1 (💎 ${getCurrentBanner()?.cost.amount || 160})`}
-            </button>
-          </div>
-
-          <div className="gacha-option">
-            <h4>Multi Pull</h4>
-            <p>Pull 10 items (guaranteed SR+!)</p>
-            <button
-              className="gacha-button multi"
-              onClick={performMultiGachaAction}
-              disabled={isLoading}
-            >
-              {isLoading && pullType === "multi"
-                ? "Pulling..."
-                : `Pull x10 (💎 ${
-                    getCurrentBanner()?.cost.discount?.multiPull || 1600
-                  })`}
-            </button>
-          </div>
-        </div>
-
-        {renderGachaResult()}
       </div>
     </div>
   );
