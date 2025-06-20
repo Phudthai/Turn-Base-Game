@@ -1,9 +1,11 @@
 import { Elysia } from "elysia";
-import { authRoutes } from "../routes/auth.routes";
-import { gachaRoutes } from "../routes/gacha.routes";
-import { battleRoutes } from "../routes/battle.routes";
-import { inventoryRoutes } from "../routes/inventory.routes";
-import { dataRoutes } from "../routes/data.routes";
+import {
+  authRoutes,
+  gachaRoutes,
+  battleRoutes,
+  inventoryRoutes,
+  dataRoutes,
+} from "../routes";
 
 export const configureRoutes = (app: Elysia) => {
   return app
@@ -11,6 +13,7 @@ export const configureRoutes = (app: Elysia) => {
     .get("/health", () => ({
       status: "OK",
       timestamp: new Date().toISOString(),
+      version: "1.0.0",
     }))
     .group("/api", (app) => {
       return app

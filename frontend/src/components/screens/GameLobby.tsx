@@ -313,99 +313,103 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
 
           {/* Content Areas with Enhanced Styling */}
           <div className="content-areas">
-            {contentAreas.map((area) => (
-              <div
-                key={area.id}
-                className={`content-area ${area.unlocked ? "" : "locked"} ${
-                  hoveredArea === area.id ? "hovered" : ""
-                } ${selectedArea === area.id ? "selected" : ""}`}
-                style={{
-                  left: area.position.x,
-                  top: area.position.y,
-                  width: area.size.width,
-                  height: area.size.height,
-                }}
-                onMouseEnter={() => setHoveredArea(area.id)}
-                onMouseLeave={() => setHoveredArea(null)}
-                onClick={() => handleAreaClick(area.id)}
-              >
-                <div className="area-background">
-                  <div className="area-structure">
-                    {area.id === "gacha" && (
-                      <div className="portal-structure">
-                        <div className="portal-ring portal-ring-1"></div>
-                        <div className="portal-ring portal-ring-2"></div>
-                        <div className="portal-center"></div>
-                        <div className="portal-energy"></div>
-                      </div>
-                    )}
-                    {area.id === "campaign" && (
-                      <div className="campaign-structure">
-                        <div className="campaign-map"></div>
-                        <div className="campaign-path"></div>
-                        <div className="campaign-markers"></div>
-                      </div>
-                    )}
-                    {area.id === "arena" && (
-                      <div className="arena-structure">
-                        <div className="arena-walls"></div>
-                        <div className="arena-floor"></div>
-                        <div className="arena-stands"></div>
-                      </div>
-                    )}
-                    {area.id === "market" && (
-                      <div className="shop-structure">
-                        <div className="shop-roof"></div>
-                        <div className="shop-walls"></div>
-                        <div className="shop-door"></div>
-                        <div className="shop-sign"></div>
-                      </div>
-                    )}
-                    {area.id === "guild" && (
-                      <div className="guild-structure">
-                        <div className="guild-hall"></div>
-                        <div className="guild-towers"></div>
-                        <div className="guild-banner"></div>
-                      </div>
-                    )}
+            <div className="content-areas-container">
+              {contentAreas.map((area) => (
+                <div
+                  key={area.id}
+                  className={`content-area ${area.unlocked ? "" : "locked"} ${
+                    hoveredArea === area.id ? "hovered" : ""
+                  } ${selectedArea === area.id ? "selected" : ""}`}
+                  style={{
+                    left: area.position.x,
+                    top: area.position.y,
+                    width: area.size.width,
+                    height: area.size.height,
+                  }}
+                  onMouseEnter={() => setHoveredArea(area.id)}
+                  onMouseLeave={() => setHoveredArea(null)}
+                  onClick={() => handleAreaClick(area.id)}
+                >
+                  <div className="area-background">
+                    <div className="area-structure">
+                      {area.id === "gacha" && (
+                        <div className="portal-structure">
+                          <div className="portal-ring portal-ring-1"></div>
+                          <div className="portal-ring portal-ring-2"></div>
+                          <div className="portal-center"></div>
+                          <div className="portal-energy"></div>
+                        </div>
+                      )}
+                      {area.id === "campaign" && (
+                        <div className="campaign-structure">
+                          <div className="campaign-map"></div>
+                          <div className="campaign-path"></div>
+                          <div className="campaign-markers"></div>
+                        </div>
+                      )}
+                      {area.id === "arena" && (
+                        <div className="arena-structure">
+                          <div className="arena-walls"></div>
+                          <div className="arena-floor"></div>
+                          <div className="arena-stands"></div>
+                        </div>
+                      )}
+                      {area.id === "market" && (
+                        <div className="shop-structure">
+                          <div className="shop-roof"></div>
+                          <div className="shop-walls"></div>
+                          <div className="shop-door"></div>
+                          <div className="shop-sign"></div>
+                        </div>
+                      )}
+                      {area.id === "guild" && (
+                        <div className="guild-structure">
+                          <div className="guild-hall"></div>
+                          <div className="guild-towers"></div>
+                          <div className="guild-banner"></div>
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+                  <div className="area-icon">{area.icon}</div>
+
+                  <div className="area-name">{area.name}</div>
+
+                  {area.notification && (
+                    <div className="notification-badge">
+                      {area.notification}
+                    </div>
+                  )}
+
+                  {!area.unlocked && (
+                    <div className="lock-overlay">
+                      <span className="lock-icon">🔒</span>
+                    </div>
+                  )}
+
+                  {/* Enhanced Tooltip */}
+                  {hoveredArea === area.id && (
+                    <div className="area-tooltip">
+                      <h4>{area.name}</h4>
+                      <p>{area.description}</p>
+                      {!area.unlocked && (
+                        <div className="unlock-requirement">
+                          Unlock at level{" "}
+                          {area.id === "arena"
+                            ? 3
+                            : area.id === "guild"
+                            ? 5
+                            : area.id === "dungeon"
+                            ? 10
+                            : 15}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-
-                <div className="area-icon">{area.icon}</div>
-
-                <div className="area-name">{area.name}</div>
-
-                {area.notification && (
-                  <div className="notification-badge">{area.notification}</div>
-                )}
-
-                {!area.unlocked && (
-                  <div className="lock-overlay">
-                    <span className="lock-icon">🔒</span>
-                  </div>
-                )}
-
-                {/* Enhanced Tooltip */}
-                {hoveredArea === area.id && (
-                  <div className="area-tooltip">
-                    <h4>{area.name}</h4>
-                    <p>{area.description}</p>
-                    {!area.unlocked && (
-                      <div className="unlock-requirement">
-                        Unlock at level{" "}
-                        {area.id === "arena"
-                          ? 3
-                          : area.id === "guild"
-                          ? 5
-                          : area.id === "dungeon"
-                          ? 10
-                          : 15}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Floating Particles Effect */}
@@ -428,10 +432,10 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
       {/* Enhanced Bottom Menu */}
       <div className="bottom-menu">
         <button className="menu-button" onClick={() => onNavigate("inventory")}>
-          🎒 Inventory
+          🎒
         </button>
         <button className="menu-button" onClick={() => onNavigate("settings")}>
-          ⚙️ Settings
+          ⚙️
         </button>
       </div>
 
