@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { inventoryAPI } from "../../services/api";
+import { inventoryAPI, authAPI } from "../../services/api";
+import "./CharacterSelectionScreen.css";
 
 interface CharacterSelectionScreenProps {
   onBack: () => void;
@@ -36,15 +37,19 @@ export function CharacterSelectionScreen({
 }: CharacterSelectionScreenProps) {
   const { user, token } = useAuth();
   const [characters, setCharacters] = useState<UserCharacter[]>([]);
+  const [filteredCharacters, setFilteredCharacters] = useState<UserCharacter[]>(
+    []
+  );
   const [selectedCharacters, setSelectedCharacters] = useState<UserCharacter[]>(
     []
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<"level" | "rarity" | "power">("level");
-  const [filterRarity, setFilterRarity] = useState<"all" | "R" | "SR" | "SSR">(
-    "all"
-  );
+
+  // Filter states
+  const [rarityFilter, setRarityFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("level");
+  const [sortOrder, setSortOrder] = useState<string>("desc");
 
   const maxTeamSize = 3; // Maximum characters for battle
 
@@ -52,43 +57,119 @@ export function CharacterSelectionScreen({
     loadCharacters();
   }, []);
 
+  useEffect(() => {
+    applyFilters();
+  }, [characters, rarityFilter, sortBy, sortOrder]);
+
+  const applyFilters = () => {
+    let filtered = [...characters];
+
+    // Apply rarity filter
+    if (rarityFilter !== "all") {
+      filtered = filtered.filter((char) => char.rarity === rarityFilter);
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+
+      switch (sortBy) {
+        case "level":
+          aValue = a.level;
+          bValue = b.level;
+          break;
+        case "power":
+          aValue = a.powerLevel || 0;
+          bValue = b.powerLevel || 0;
+          break;
+        case "name":
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case "rarity":
+          const rarityOrder = { SSR: 3, SR: 2, R: 1 };
+          aValue = rarityOrder[a.rarity as keyof typeof rarityOrder];
+          bValue = rarityOrder[b.rarity as keyof typeof rarityOrder];
+          break;
+        default:
+          aValue = a.level;
+          bValue = b.level;
+      }
+
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setFilteredCharacters(filtered);
+  };
+
   const loadCharacters = async () => {
-    if (!token) return;
+    if (!token) {
+      setError("Please login to access characters");
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
-      const response = await inventoryAPI.getCharactersGrid(token);
+      console.log("Loading characters for user:", user?.id);
 
-      if (response.characters) {
-        // Get detailed character data
-        const detailedCharacters = await Promise.all(
-          response.characters.map(async (char: any) => {
-            try {
-              const detailResponse = await inventoryAPI.getCharacterDetail(
-                token,
-                char.id
-              );
-              return detailResponse.character;
-            } catch (err) {
-              console.error(
-                `Failed to get details for character ${char.id}:`,
-                err
-              );
-              return null;
-            }
-          })
-        );
+      // Use the full characters endpoint instead of grid + individual calls
+      const response = await inventoryAPI.getCharacters(token);
+      console.log("Characters response:", response);
 
-        const validCharacters = detailedCharacters.filter(
-          (char) => char !== null
+      if (response && response.characters) {
+        if (response.characters.length === 0) {
+          setError(
+            "No characters found in your inventory. Try using the Gacha system to get some characters first!"
+          );
+          setCharacters([]);
+          setLoading(false);
+          return;
+        }
+
+        // Transform the data to match our interface - backend now has full data including templates
+        const transformedCharacters = response.characters.map((char: any) => ({
+          id: char.id, // This is the _id from MongoDB
+          characterId: char.characterId,
+          name: char.name, // Now available from backend template
+          level: char.level,
+          rarity: char.rarity, // Now available from backend template
+          currentStats: char.currentStats,
+          powerLevel: char.powerLevel,
+          isLocked: char.metadata?.isLocked || false,
+          isFavorite: char.metadata?.isFavorite || false,
+          artwork: char.artwork || {
+            icon: "👤",
+            thumbnail: "👤",
+          },
+        }));
+
+        console.log(
+          "Transformed characters loaded:",
+          transformedCharacters.length
         );
-        setCharacters(validCharacters);
+        setCharacters(transformedCharacters);
+      } else {
+        setError(
+          "No characters found in your inventory. Try using the Gacha system to get some characters first!"
+        );
+        setCharacters([]);
       }
     } catch (err: any) {
       console.error("Error loading characters:", err);
-      setError(err.message || "Failed to load characters");
+      if (err.message.includes("characters")) {
+        setError(
+          "No characters found in your inventory. Try using the Gacha system to get some characters first!"
+        );
+      } else {
+        setError(err.message || "Failed to load characters");
+      }
     } finally {
       setLoading(false);
     }
@@ -120,44 +201,6 @@ export function CharacterSelectionScreen({
     onStartBattle(selectedCharacters);
   };
 
-  const getSortedAndFilteredCharacters = () => {
-    let filtered = characters;
-
-    // Filter by rarity
-    if (filterRarity !== "all") {
-      filtered = filtered.filter((char) => char.rarity === filterRarity);
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "level":
-          return b.level - a.level;
-        case "rarity":
-          const rarityOrder = { SSR: 3, SR: 2, R: 1 };
-          return rarityOrder[b.rarity] - rarityOrder[a.rarity];
-        case "power":
-          const aPower = a.powerLevel || calculatePowerLevel(a);
-          const bPower = b.powerLevel || calculatePowerLevel(b);
-          return bPower - aPower;
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  };
-
-  const calculatePowerLevel = (character: UserCharacter) => {
-    const stats = character.currentStats;
-    return Math.floor(
-      stats.hp * 0.3 +
-        stats.attack * 0.4 +
-        stats.defense * 0.2 +
-        stats.speed * 0.1
-    );
-  };
-
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
       case "SSR":
@@ -171,7 +214,7 @@ export function CharacterSelectionScreen({
     }
   };
 
-  const getRarityEmoji = (rarity: string) => {
+  const getRarityStars = (rarity: string) => {
     switch (rarity) {
       case "SSR":
         return "⭐⭐⭐";
@@ -187,7 +230,7 @@ export function CharacterSelectionScreen({
   if (loading) {
     return (
       <div className="character-selection-screen">
-        <div className="loading-container">
+        <div className="loading-spinner">
           <div className="spinner"></div>
           <p>Loading characters...</p>
         </div>
@@ -198,68 +241,54 @@ export function CharacterSelectionScreen({
   if (error) {
     return (
       <div className="character-selection-screen">
-        <button className="back-button" onClick={onBack}>
-          ← Back
-        </button>
-        <div className="error-container">
-          <h3>❌ Error</h3>
+        <div className="error-message">
+          <h3>❌ Error Loading Characters</h3>
           <p>{error}</p>
-          <button onClick={loadCharacters} className="retry-button">
-            🔄 Retry
-          </button>
+          <div className="error-actions">
+            <button className="retry-button" onClick={loadCharacters}>
+              🔄 Retry
+            </button>
+            <button className="back-to-lobby-button" onClick={onBack}>
+              🏠 Back to Lobby
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const sortedCharacters = getSortedAndFilteredCharacters();
-
   return (
     <div className="character-selection-screen">
-      <div className="header">
+      {/* Header with centered title and counter */}
+      <div className="selection-header">
         <button className="back-button" onClick={onBack}>
           ← Back
         </button>
-        <h2>⚔️ Select Battle Team</h2>
-        <div className="team-counter">
-          {selectedCharacters.length}/{maxTeamSize}
-        </div>
-      </div>
 
-      {/* Selected Team Preview */}
-      {selectedCharacters.length > 0 && (
-        <div className="selected-team">
-          <h3>🛡️ Selected Team</h3>
-          <div className="selected-characters">
-            {selectedCharacters.map((character, index) => (
-              <div key={character.id} className="selected-character">
-                <div className="character-icon">
-                  {character.artwork?.icon || "👤"}
-                </div>
-                <div className="character-info">
-                  <div className="character-name">{character.name}</div>
-                  <div className="character-level">Lv.{character.level}</div>
-                </div>
-                <button
-                  className="remove-button"
-                  onClick={() => handleCharacterSelect(character)}
-                  title="Remove from team"
-                >
-                  ❌
-                </button>
-              </div>
-            ))}
+        <div className="header-center">
+          <h2>⚔️ Select Battle Team</h2>
+          <div className="team-counter">
+            {selectedCharacters.length}/{maxTeamSize} selected
           </div>
         </div>
-      )}
 
-      {/* Filters and Sorting */}
-      <div className="controls">
-        <div className="filter-section">
-          <label>Filter by Rarity:</label>
+        <button
+          className="start-battle-button"
+          onClick={handleStartBattle}
+          disabled={selectedCharacters.length === 0}
+        >
+          ⚔️ Start Battle
+        </button>
+      </div>
+
+      {/* Filters Section */}
+      <div className="filters-section">
+        <div className="filter-group">
+          <label>Rarity:</label>
           <select
-            value={filterRarity}
-            onChange={(e) => setFilterRarity(e.target.value as any)}
+            value={rarityFilter}
+            onChange={(e) => setRarityFilter(e.target.value)}
+            className="filter-select"
           >
             <option value="all">All Rarities</option>
             <option value="SSR">SSR ⭐⭐⭐</option>
@@ -268,113 +297,192 @@ export function CharacterSelectionScreen({
           </select>
         </div>
 
-        <div className="sort-section">
+        <div className="filter-group">
           <label>Sort by:</label>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="filter-select"
           >
             <option value="level">Level</option>
-            <option value="rarity">Rarity</option>
             <option value="power">Power</option>
+            <option value="name">Name</option>
+            <option value="rarity">Rarity</option>
           </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Order:</label>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="filter-select"
+          >
+            <option value="desc">High to Low</option>
+            <option value="asc">Low to High</option>
+          </select>
+        </div>
+
+        <div className="results-count">
+          {filteredCharacters.length} characters
         </div>
       </div>
 
-      {/* Character Grid */}
-      <div className="characters-grid">
-        {sortedCharacters.length === 0 ? (
-          <div className="no-characters">
-            <p>No characters found matching your filters.</p>
-          </div>
-        ) : (
-          sortedCharacters.map((character) => {
-            const isSelected = selectedCharacters.some(
-              (c) => c.id === character.id
-            );
-            const isLocked = character.isLocked;
-            const powerLevel =
-              character.powerLevel || calculatePowerLevel(character);
-
-            return (
-              <div
-                key={character.id}
-                className={`character-card ${isSelected ? "selected" : ""} ${
-                  isLocked ? "locked" : ""
-                }`}
-                onClick={() => handleCharacterSelect(character)}
-                style={{
-                  borderColor: isSelected
-                    ? getRarityColor(character.rarity)
-                    : undefined,
-                }}
-              >
-                {isLocked && <div className="lock-overlay">🔒</div>}
-                {character.isFavorite && (
-                  <div className="favorite-badge">❤️</div>
-                )}
-
-                <div className="character-icon">
-                  {character.artwork?.icon || "👤"}
-                </div>
-
-                <div className="character-info">
-                  <div className="character-name">{character.name}</div>
-                  <div
-                    className="character-rarity"
-                    style={{ color: getRarityColor(character.rarity) }}
-                  >
-                    {getRarityEmoji(character.rarity)}
-                  </div>
-                  <div className="character-level">Lv.{character.level}</div>
-                  <div className="power-level">⚡ {powerLevel}</div>
-                </div>
-
-                <div className="character-stats">
-                  <div className="stat">
-                    <span className="stat-label">HP:</span>
-                    <span className="stat-value">
-                      {character.currentStats.hp}
-                    </span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-label">ATK:</span>
-                    <span className="stat-value">
-                      {character.currentStats.attack}
-                    </span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-label">DEF:</span>
-                    <span className="stat-value">
-                      {character.currentStats.defense}
-                    </span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-label">SPD:</span>
-                    <span className="stat-value">
-                      {character.currentStats.speed}
-                    </span>
-                  </div>
-                </div>
-
-                {isSelected && (
-                  <div className="selection-indicator">✅ Selected</div>
-                )}
+      {/* Selected Team Preview */}
+      <div className="selected-team-preview">
+        <h3>🛡️ Battle Team</h3>
+        <div className="selected-team-icons">
+          {selectedCharacters.map((character, index) => (
+            <div key={character.id} className="selected-icon">
+              <div className="character-mini-icon">
+                {character.artwork?.icon || "👤"}
               </div>
-            );
-          })
-        )}
+              <div className="mini-level">Lv.{character.level}</div>
+              <button
+                className="remove-mini-button"
+                onClick={() => handleCharacterSelect(character)}
+                title="Remove from team"
+              >
+                ❌
+              </button>
+            </div>
+          ))}
+          {/* Fill empty slots */}
+          {Array.from({
+            length: maxTeamSize - selectedCharacters.length,
+          }).map((_, index) => (
+            <div key={`empty-${index}`} className="empty-slot">
+              <div className="empty-icon">+</div>
+              <div className="empty-text">Empty</div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Start Battle Button */}
-      <div className="battle-controls">
-        <button
-          className="start-battle-button"
-          onClick={handleStartBattle}
-          disabled={selectedCharacters.length === 0}
-        >
-          ⚔️ Start Battle ({selectedCharacters.length} characters)
-        </button>
+      {/* Character Selection Area */}
+      <div className="character-selection-area">
+        <h3>📋 Choose Your Characters</h3>
+        <p className="instruction">Swipe left or right to browse characters</p>
+
+        {filteredCharacters.length === 0 ? (
+          <div className="no-characters">
+            <p>No characters found matching your filters.</p>
+            <p>Try adjusting your filter settings!</p>
+          </div>
+        ) : (
+          <div className="characters-carousel">
+            <div className="characters-scroll">
+              {filteredCharacters.map((character) => {
+                const isSelected = selectedCharacters.some(
+                  (c) => c.id === character.id
+                );
+                const isLocked = character.isLocked;
+                const powerLevel =
+                  character.powerLevel ||
+                  Math.floor(
+                    character.currentStats.hp * 0.3 +
+                      character.currentStats.attack * 0.4 +
+                      character.currentStats.defense * 0.2 +
+                      character.currentStats.speed * 0.1
+                  );
+
+                return (
+                  <div
+                    key={character.id}
+                    className={`character-card-horizontal ${
+                      isSelected ? "selected" : ""
+                    } ${isLocked ? "locked" : ""}`}
+                    onClick={() => handleCharacterSelect(character)}
+                  >
+                    {/* Grade (Rarity) - Top Left */}
+                    <div
+                      className="character-grade-badge"
+                      style={{ color: getRarityColor(character.rarity) }}
+                    >
+                      {character.rarity}
+                    </div>
+
+                    {/* Power Level - Top Right */}
+                    <div className="character-power-badge">⚡ {powerLevel}</div>
+
+                    {isLocked && <div className="lock-overlay">🔒</div>}
+                    {character.isFavorite && (
+                      <div className="favorite-badge">❤️</div>
+                    )}
+
+                    {/* Character Icon - Large and Prominent */}
+                    <div className="character-main-icon">
+                      {character.artwork?.icon || "👤"}
+                    </div>
+
+                    {/* Character Info */}
+                    <div className="character-info-horizontal">
+                      <div className="character-name">{character.name}</div>
+
+                      {/* Level - Prominent */}
+                      <div className="character-level-large">
+                        Lv.{character.level}
+                      </div>
+
+                      {/* Rarity with Stars */}
+                      <div
+                        className="character-rarity-stars"
+                        style={{ color: getRarityColor(character.rarity) }}
+                      >
+                        {getRarityStars(character.rarity)}
+                      </div>
+
+                      {/* Quick Stats */}
+                      <div className="quick-stats">
+                        <div className="stat-item">
+                          <span className="stat-icon">❤️</span>
+                          <span className="stat-value">
+                            {character.currentStats.hp}
+                          </span>
+                        </div>
+                        <div className="stat-item">
+                          <span className="stat-icon">⚔️</span>
+                          <span className="stat-value">
+                            {character.currentStats.attack}
+                          </span>
+                        </div>
+                        <div className="stat-item">
+                          <span className="stat-icon">🛡️</span>
+                          <span className="stat-value">
+                            {character.currentStats.defense}
+                          </span>
+                        </div>
+                        <div className="stat-item">
+                          <span className="stat-icon">💨</span>
+                          <span className="stat-value">
+                            {character.currentStats.speed}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Selection Indicator */}
+                    {isSelected && (
+                      <div className="selection-indicator-horizontal">
+                        <div className="checkmark">✅</div>
+                        <div className="selected-text">SELECTED</div>
+                      </div>
+                    )}
+
+                    {/* Rarity Border */}
+                    <div
+                      className="rarity-border"
+                      style={{
+                        backgroundColor: getRarityColor(character.rarity),
+                        opacity: isSelected ? 1 : 0.3,
+                      }}
+                    ></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

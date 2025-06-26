@@ -190,6 +190,15 @@ export class InventoryController {
 
       const characters = await CharacterService.getUserCharacters(user.id);
 
+      // Get character templates for name, rarity, and artwork
+      const characterIds = characters.map((char) => char.characterId);
+      const characterTemplates = await Character.find({
+        id: { $in: characterIds },
+      });
+      const characterTemplateMap = new Map(
+        characterTemplates.map((template) => [template.id, template])
+      );
+
       return {
         success: true,
         data: {
@@ -203,9 +212,14 @@ export class InventoryController {
                 stats.speed * 0.1
             );
 
+            // Get template data for name, rarity, and artwork
+            const template = characterTemplateMap.get(char.characterId);
+
             return {
               id: char._id,
               characterId: char.characterId,
+              name: template?.name || char.characterId,
+              rarity: template?.rarity || "R",
               level: char.level,
               experience: char.experience,
               currentStats: char.currentStats,
@@ -214,6 +228,7 @@ export class InventoryController {
               equipments: char.equipments,
               battleStats: char.battleStats,
               metadata: char.metadata,
+              artwork: template?.artwork || { icon: "👤", thumbnail: "👤" },
             };
           }),
           total: characters.length,

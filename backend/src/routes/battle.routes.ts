@@ -2,7 +2,7 @@ import { Elysia, t } from "elysia";
 import * as BattleController from "../controllers/battle.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
-console.log("Setting up battle routes");
+console.log("Setting up enhanced battle routes");
 
 export const battleRoutes = new Elysia({ prefix: "/battle" })
   .use(authMiddleware)
@@ -14,6 +14,22 @@ export const battleRoutes = new Elysia({ prefix: "/battle" })
     {
       body: t.Object({
         characterIds: t.Array(t.String()),
+        difficulty: t.Optional(
+          t.Union([
+            t.Literal("easy"),
+            t.Literal("normal"),
+            t.Literal("hard"),
+            t.Literal("nightmare"),
+          ])
+        ),
+        battleType: t.Optional(
+          t.Union([
+            t.Literal("pve"),
+            t.Literal("pvp"),
+            t.Literal("boss"),
+            t.Literal("dungeon"),
+          ])
+        ),
       }),
     }
   )
@@ -38,10 +54,49 @@ export const battleRoutes = new Elysia({ prefix: "/battle" })
         battleId: t.String(),
       }),
       body: t.Object({
-        type: t.Union([t.Literal("skill"), t.Literal("basic_attack")]),
+        type: t.Union([
+          t.Literal("skill"),
+          t.Literal("basic_attack"),
+          t.Literal("defend"),
+          t.Literal("item"),
+        ]),
         characterId: t.String(),
         targetIds: t.Array(t.String()),
         skillId: t.Optional(t.String()),
+        itemId: t.Optional(t.String()),
+      }),
+    }
+  )
+  .post(
+    "/:battleId/complete",
+    async ({ params, user }) => {
+      return BattleController.completeBattle({ params, user });
+    },
+    {
+      params: t.Object({
+        battleId: t.String(),
+      }),
+    }
+  )
+  .get(
+    "/:battleId/rewards",
+    async ({ params }) => {
+      return BattleController.getBattleRewards({ params });
+    },
+    {
+      params: t.Object({
+        battleId: t.String(),
+      }),
+    }
+  )
+  .get(
+    "/:battleId/statistics",
+    async ({ params }) => {
+      return BattleController.getBattleStatistics({ params });
+    },
+    {
+      params: t.Object({
+        battleId: t.String(),
       }),
     }
   );

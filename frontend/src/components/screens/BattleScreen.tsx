@@ -1,9 +1,33 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useGameAPI } from "../../hooks/useGameAPI";
+import { CharacterSelectionScreen } from "./CharacterSelectionScreen";
+import "./BattleScreen.css";
 
 interface BattleScreenProps {
   onBack: () => void;
+}
+
+interface UserCharacter {
+  id: string;
+  characterId: string;
+  name: string;
+  level: number;
+  rarity: "R" | "SR" | "SSR";
+  currentStats: {
+    hp: number;
+    attack: number;
+    defense: number;
+    speed: number;
+    critRate: number;
+    critDamage: number;
+  };
+  powerLevel?: number;
+  isLocked: boolean;
+  isFavorite: boolean;
+  artwork?: {
+    icon: string;
+    thumbnail: string;
+  };
 }
 
 interface BattleCharacter {
@@ -19,9 +43,10 @@ interface BattleCharacter {
   speed: number;
   skills: BattleSkill[];
   isPlayer: boolean;
-  position: { x: number; y: number };
-  isAnimating: boolean;
-  animationType: "idle" | "attack" | "skill" | "damage" | "victory" | "defeat";
+  artwork?: {
+    icon: string;
+    thumbnail: string;
+  };
 }
 
 interface BattleSkill {
@@ -34,523 +59,791 @@ interface BattleSkill {
 }
 
 interface BattleState {
-  phase: "preparation" | "battle" | "victory" | "defeat";
+  phase:
+    | "character_selection"
+    | "preparation"
+    | "battle"
+    | "victory"
+    | "defeat";
   turn: "player" | "enemy";
   turnCount: number;
   selectedAction: "attack" | "skill" | "defend" | null;
   selectedSkill: BattleSkill | null;
   battleLog: string[];
   isProcessing: boolean;
+  selectedDifficulty: "easy" | "normal" | "hard" | "nightmare";
+  selectedEnemy: string;
 }
 
-export function BattleScreen({ onBack }: BattleScreenProps) {
-  const { user } = useAuth();
-  const { startBattle, isLoading } = useGameAPI();
-
-  // Battle Characters
-  const [playerCharacter, setPlayerCharacter] = useState<BattleCharacter>({
-    id: "player_char",
-    name: "Hero",
-    level: 5,
-    hp: 100,
-    maxHp: 100,
-    mp: 50,
-    maxMp: 50,
-    attack: 25,
-    defense: 15,
-    speed: 20,
-    skills: [
-      {
-        id: "fireball",
-        name: "🔥 Fireball",
-        mpCost: 10,
-        damage: 35,
-        type: "attack",
-        description: "Fire magic attack",
-      },
-      {
-        id: "heal",
-        name: "💚 Heal",
-        mpCost: 15,
-        damage: -30,
-        type: "heal",
-        description: "Restore HP",
-      },
-      {
-        id: "lightning",
-        name: "⚡ Lightning",
-        mpCost: 20,
-        damage: 45,
-        type: "attack",
-        description: "Lightning strike",
-      },
-    ],
-    isPlayer: true,
-    position: { x: 20, y: 50 },
-    isAnimating: false,
-    animationType: "idle",
-  });
-
-  const [enemyCharacter, setEnemyCharacter] = useState<BattleCharacter>({
-    id: "enemy_char",
+const ENEMY_TYPES = [
+  {
+    id: "goblin",
     name: "Goblin Warrior",
     level: 4,
     hp: 80,
-    maxHp: 80,
     mp: 30,
-    maxMp: 30,
     attack: 20,
     defense: 10,
     speed: 15,
-    skills: [
-      {
-        id: "slash",
-        name: "🗡️ Slash",
-        mpCost: 5,
-        damage: 25,
-        type: "attack",
-        description: "Basic sword attack",
-      },
-      {
-        id: "rage",
-        name: "😡 Rage",
-        mpCost: 10,
-        damage: 35,
-        type: "attack",
-        description: "Powerful attack",
-      },
-    ],
-    isPlayer: false,
-    position: { x: 80, y: 50 },
-    isAnimating: false,
-    animationType: "idle",
-  });
+    icon: "👹",
+    description: "A fierce goblin warrior with basic combat skills",
+  },
+  {
+    id: "orc",
+    name: "Orc Shaman",
+    level: 6,
+    hp: 120,
+    mp: 60,
+    attack: 25,
+    defense: 15,
+    speed: 12,
+    icon: "🧌",
+    description: "A powerful orc that uses dark magic",
+  },
+  {
+    id: "undead",
+    name: "Undead Knight",
+    level: 8,
+    hp: 150,
+    mp: 40,
+    attack: 30,
+    defense: 25,
+    speed: 10,
+    icon: "💀",
+    description: "An armored undead warrior with high defense",
+  },
+];
+
+const DIFFICULTY_SETTINGS = {
+  easy: { multiplier: 0.8, rewards: 1.0, name: "Easy", color: "#4ade80" },
+  normal: { multiplier: 1.0, rewards: 1.2, name: "Normal", color: "#3b82f6" },
+  hard: { multiplier: 1.3, rewards: 1.5, name: "Hard", color: "#f59e0b" },
+  nightmare: {
+    multiplier: 1.6,
+    rewards: 2.0,
+    name: "Nightmare",
+    color: "#ef4444",
+  },
+};
+
+export function BattleScreen({ onBack }: BattleScreenProps) {
+  const { user } = useAuth();
+
+  const [selectedCharacters, setSelectedCharacters] = useState<UserCharacter[]>(
+    []
+  );
+  const [playerCharacters, setPlayerCharacters] = useState<BattleCharacter[]>(
+    []
+  );
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
 
   const [battleState, setBattleState] = useState<BattleState>({
-    phase: "preparation",
+    phase: "character_selection",
     turn: "player",
     turnCount: 1,
     selectedAction: null,
     selectedSkill: null,
     battleLog: ["⚔️ Battle begins!"],
     isProcessing: false,
+    selectedDifficulty: "normal",
+    selectedEnemy: "goblin",
   });
 
-  // Start Battle
-  const handleStartBattle = () => {
-    setBattleState((prev) => ({
-      ...prev,
-      phase: "battle",
-      battleLog: [...prev.battleLog, `🎯 Turn ${prev.turnCount} - Your turn!`],
-    }));
-  };
+  // Convert UserCharacter to BattleCharacter
+  const convertToBattleCharacter = (
+    userChar: UserCharacter,
+    index: number
+  ): BattleCharacter => {
+    const baseHp = userChar.currentStats.hp;
+    const baseMp = Math.floor(baseHp * 0.5);
 
-  // Player Actions
-  const handleAttack = () => {
-    if (battleState.isProcessing) return;
-    setBattleState((prev) => ({ ...prev, selectedAction: "attack" }));
-    executePlayerAction("attack");
-  };
-
-  const handleSkill = (skill: BattleSkill) => {
-    if (battleState.isProcessing || playerCharacter.mp < skill.mpCost) return;
-    setBattleState((prev) => ({
-      ...prev,
-      selectedAction: "skill",
-      selectedSkill: skill,
-    }));
-    executePlayerAction("skill", skill);
-  };
-
-  const handleDefend = () => {
-    if (battleState.isProcessing) return;
-    setBattleState((prev) => ({ ...prev, selectedAction: "defend" }));
-    executePlayerAction("defend");
-  };
-
-  // Execute Actions
-  const executePlayerAction = async (action: string, skill?: BattleSkill) => {
-    setBattleState((prev) => ({ ...prev, isProcessing: true }));
-
-    // Animate player character
-    setPlayerCharacter((prev) => ({
-      ...prev,
-      isAnimating: true,
-      animationType: action === "skill" ? "skill" : "attack",
-    }));
-
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Animation delay
-
-    let damage = 0;
-    let logMessage = "";
-
-    if (action === "attack") {
-      damage = Math.max(
-        1,
-        playerCharacter.attack -
-          enemyCharacter.defense +
-          Math.floor(Math.random() * 10) -
-          5
-      );
-      logMessage = `⚔️ ${playerCharacter.name} attacks for ${damage} damage!`;
-    } else if (action === "skill" && skill) {
-      if (skill.type === "heal") {
-        const healAmount = Math.abs(skill.damage);
-        setPlayerCharacter((prev) => ({
-          ...prev,
-          hp: Math.min(prev.maxHp, prev.hp + healAmount),
-          mp: prev.mp - skill.mpCost,
-        }));
-        logMessage = `💚 ${playerCharacter.name} heals for ${healAmount} HP!`;
-      } else {
-        damage = Math.max(
-          1,
-          skill.damage -
-            enemyCharacter.defense +
-            Math.floor(Math.random() * 10) -
-            5
-        );
-        setPlayerCharacter((prev) => ({ ...prev, mp: prev.mp - skill.mpCost }));
-        logMessage = `✨ ${playerCharacter.name} uses ${skill.name} for ${damage} damage!`;
-      }
-    } else if (action === "defend") {
-      logMessage = `🛡️ ${playerCharacter.name} defends!`;
-    }
-
-    // Apply damage to enemy
-    if (damage > 0) {
-      setEnemyCharacter((prev) => ({
-        ...prev,
-        hp: Math.max(0, prev.hp - damage),
-        isAnimating: true,
-        animationType: "damage",
-      }));
-
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      setEnemyCharacter((prev) => ({
-        ...prev,
-        isAnimating: false,
-        animationType: "idle",
-      }));
-    }
-
-    // Reset player animation
-    setPlayerCharacter((prev) => ({
-      ...prev,
-      isAnimating: false,
-      animationType: "idle",
-    }));
-
-    // Update battle log
-    setBattleState((prev) => ({
-      ...prev,
-      battleLog: [...prev.battleLog, logMessage],
-      selectedAction: null,
-      selectedSkill: null,
-    }));
-
-    // Check if enemy is defeated
-    if (enemyCharacter.hp - damage <= 0) {
-      setBattleState((prev) => ({
-        ...prev,
-        phase: "victory",
-        isProcessing: false,
-        battleLog: [...prev.battleLog, "🎉 Victory! You defeated the enemy!"],
-      }));
-      setEnemyCharacter((prev) => ({ ...prev, animationType: "defeat" }));
-      setPlayerCharacter((prev) => ({ ...prev, animationType: "victory" }));
-      return;
-    }
-
-    // Enemy turn
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    executeEnemyAction();
-  };
-
-  const executeEnemyAction = async () => {
-    // Simple AI: Random attack or skill
-    const useSkill = Math.random() > 0.6 && enemyCharacter.mp >= 5;
-    const skill =
-      enemyCharacter.skills[
-        Math.floor(Math.random() * enemyCharacter.skills.length)
-      ];
-
-    setEnemyCharacter((prev) => ({
-      ...prev,
-      isAnimating: true,
-      animationType: useSkill ? "skill" : "attack",
-    }));
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    let damage = 0;
-    let logMessage = "";
-
-    if (useSkill && enemyCharacter.mp >= skill.mpCost) {
-      damage = Math.max(
-        1,
-        skill.damage -
-          playerCharacter.defense +
-          Math.floor(Math.random() * 8) -
-          4
-      );
-      setEnemyCharacter((prev) => ({ ...prev, mp: prev.mp - skill.mpCost }));
-      logMessage = `💀 ${enemyCharacter.name} uses ${skill.name} for ${damage} damage!`;
-    } else {
-      damage = Math.max(
-        1,
-        enemyCharacter.attack -
-          playerCharacter.defense +
-          Math.floor(Math.random() * 8) -
-          4
-      );
-      logMessage = `💀 ${enemyCharacter.name} attacks for ${damage} damage!`;
-    }
-
-    // Apply damage to player
-    setPlayerCharacter((prev) => ({
-      ...prev,
-      hp: Math.max(0, prev.hp - damage),
-      isAnimating: true,
-      animationType: "damage",
-    }));
-
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    setPlayerCharacter((prev) => ({
-      ...prev,
-      isAnimating: false,
-      animationType: "idle",
-    }));
-    setEnemyCharacter((prev) => ({
-      ...prev,
-      isAnimating: false,
-      animationType: "idle",
-    }));
-
-    // Check if player is defeated
-    if (playerCharacter.hp - damage <= 0) {
-      setBattleState((prev) => ({
-        ...prev,
-        phase: "defeat",
-        isProcessing: false,
-        battleLog: [
-          ...prev.battleLog,
-          logMessage,
-          "💀 Defeat! You have been defeated...",
-        ],
-      }));
-      setPlayerCharacter((prev) => ({ ...prev, animationType: "defeat" }));
-      setEnemyCharacter((prev) => ({ ...prev, animationType: "victory" }));
-      return;
-    }
-
-    // Next turn
-    setBattleState((prev) => ({
-      ...prev,
-      turn: "player",
-      turnCount: prev.turnCount + 1,
-      isProcessing: false,
-      battleLog: [
-        ...prev.battleLog,
-        logMessage,
-        `🎯 Turn ${prev.turnCount + 1} - Your turn!`,
+    return {
+      id: userChar.id,
+      name: userChar.name,
+      level: userChar.level,
+      hp: baseHp,
+      maxHp: baseHp,
+      mp: baseMp,
+      maxMp: baseMp,
+      attack: userChar.currentStats.attack,
+      defense: userChar.currentStats.defense,
+      speed: userChar.currentStats.speed,
+      skills: [
+        {
+          id: "basic_attack",
+          name: "⚔️ Strike",
+          mpCost: 5,
+          damage: Math.floor(userChar.currentStats.attack * 0.8),
+          type: "attack",
+          description: "Basic attack",
+        },
+        {
+          id: "power_strike",
+          name: "💥 Power Strike",
+          mpCost: 15,
+          damage: Math.floor(userChar.currentStats.attack * 1.2),
+          type: "attack",
+          description: "Powerful attack",
+        },
+        {
+          id: "heal",
+          name: "💚 Heal",
+          mpCost: 20,
+          damage: -Math.floor(baseHp * 0.3),
+          type: "heal",
+          description: "Restore HP",
+        },
       ],
+      isPlayer: true,
+      artwork: userChar.artwork,
+    };
+  };
+
+  // Handle character selection completion
+  const handleCharacterSelection = (characters: UserCharacter[]) => {
+    setSelectedCharacters(characters);
+
+    // Convert to battle characters
+    const battleChars = characters.map((char, index) =>
+      convertToBattleCharacter(char, index)
+    );
+    setPlayerCharacters(battleChars);
+
+    // Move to preparation phase
+    setBattleState((prev) => ({
+      ...prev,
+      phase: "preparation",
     }));
   };
 
-  const getHPPercentage = (character: BattleCharacter) => {
-    return (character.hp / character.maxHp) * 100;
-  };
+  // Character Selection Phase
+  if (battleState.phase === "character_selection") {
+    return (
+      <CharacterSelectionScreen
+        onBack={onBack}
+        onStartBattle={handleCharacterSelection}
+      />
+    );
+  }
 
-  const getMPPercentage = (character: BattleCharacter) => {
-    return (character.mp / character.maxMp) * 100;
-  };
-
+  // Battle Preparation Phase
   if (battleState.phase === "preparation") {
+    const selectedEnemyData = ENEMY_TYPES.find(
+      (e) => e.id === battleState.selectedEnemy
+    );
+    const difficultyData = DIFFICULTY_SETTINGS[battleState.selectedDifficulty];
+
     return (
       <div className="battle-screen">
-        <button className="back-button" onClick={onBack}>
-          ← Back
-        </button>
+        <div className="battle-header">
+          <button
+            className="back-button"
+            onClick={() =>
+              setBattleState((prev) => ({
+                ...prev,
+                phase: "character_selection",
+              }))
+            }
+          >
+            ← Back to Character Selection
+          </button>
+
+          <div className="header-center">
+            <h1 className="battle-title">⚔️ Battle Preparation</h1>
+          </div>
+
+          <button
+            className="start-battle-button"
+            onClick={() =>
+              setBattleState((prev) => ({ ...prev, phase: "battle" }))
+            }
+          >
+            ⚔️ Start Battle
+          </button>
+        </div>
 
         <div className="battle-preparation">
-          <h2>⚔️ Battle Preparation</h2>
-          <div className="enemy-preview">
-            <h3>🏴‍☠️ {enemyCharacter.name}</h3>
-            <p>Level {enemyCharacter.level}</p>
-            <p>
-              HP: {enemyCharacter.maxHp} | MP: {enemyCharacter.maxMp}
-            </p>
+          {/* Top Row: Enemy Selection & Difficulty */}
+          <div className="preparation-top-row">
+            <div className="preparation-section enemy-selection-section">
+              <h3 className="section-title">🏴‍☠️ Choose Your Enemy</h3>
+              <div className="enemy-selection">
+                {ENEMY_TYPES.map((enemy) => (
+                  <div
+                    key={enemy.id}
+                    className={`enemy-card ${
+                      battleState.selectedEnemy === enemy.id ? "selected" : ""
+                    }`}
+                    onClick={() =>
+                      setBattleState((prev) => ({
+                        ...prev,
+                        selectedEnemy: enemy.id,
+                      }))
+                    }
+                  >
+                    <div className="enemy-icon">{enemy.icon}</div>
+                    <div className="enemy-name">{enemy.name}</div>
+                    <div className="enemy-stats">
+                      Level{" "}
+                      {Math.round(enemy.level * difficultyData.multiplier)} |
+                      HP: {Math.round(enemy.hp * difficultyData.multiplier)}
+                    </div>
+                    <div className="enemy-description">{enemy.description}</div>
+                  </div>
+                ))}
+              </div>
+
+              <h4 className="section-title">🎯 Difficulty</h4>
+              <div className="difficulty-selection">
+                {Object.entries(DIFFICULTY_SETTINGS).map(([key, diff]) => (
+                  <div
+                    key={key}
+                    className={`difficulty-card ${
+                      battleState.selectedDifficulty === key ? "selected" : ""
+                    }`}
+                    onClick={() =>
+                      setBattleState((prev) => ({
+                        ...prev,
+                        selectedDifficulty: key as any,
+                      }))
+                    }
+                  >
+                    <div
+                      className="difficulty-name"
+                      style={{ color: diff.color }}
+                    >
+                      {diff.name}
+                    </div>
+                    <div className="difficulty-info">
+                      {diff.multiplier * 100}% Stats | {diff.rewards * 100}%
+                      Rewards
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="player-preview">
-            <h3>🦸‍♂️ {playerCharacter.name}</h3>
-            <p>Level {playerCharacter.level}</p>
-            <p>
-              HP: {playerCharacter.maxHp} | MP: {playerCharacter.maxMp}
-            </p>
-          </div>
+          {/* Bottom Row: Battle Formation */}
+          <div className="preparation-bottom-row">
+            <div className="battle-formation">
+              <h3 className="section-title">⚔️ Battle Formation</h3>
 
-          <button className="start-battle-btn" onClick={handleStartBattle}>
-            ⚔️ Start Battle!
-          </button>
+              {/* Player Team Row */}
+              <div className="team-formation">
+                <div className="team-label">🛡️ Your Team</div>
+                <div className="player-team-row">
+                  {playerCharacters.map((character, index) => (
+                    <div
+                      key={character.id}
+                      className={`formation-slot player-slot ${
+                        index === currentPlayerIndex ? "active" : ""
+                      }`}
+                    >
+                      <div className="character-avatar">
+                        {character.artwork?.icon || "🦸‍♂️"}
+                      </div>
+                      <div className="character-name">{character.name}</div>
+                      <div className="character-level">
+                        Level {character.level}
+                      </div>
+                      <div className="character-stats-mini">
+                        <div className="mini-stat">
+                          <span>HP</span>
+                          <span>{character.maxHp}</span>
+                        </div>
+                        <div className="mini-stat">
+                          <span>ATK</span>
+                          <span>{character.attack}</span>
+                        </div>
+                        <div className="mini-stat">
+                          <span>DEF</span>
+                          <span>{character.defense}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="vs-section">
+                <div className="vs-text">VS</div>
+              </div>
+
+              {/* Enemy Formation */}
+              <div className="enemy-formation">
+                <div className="team-label">🏴‍☠️ Enemy</div>
+                <div className="enemy-slot-container">
+                  <div className="formation-slot enemy-slot">
+                    <div className="character-avatar">
+                      {selectedEnemyData?.icon}
+                    </div>
+                    <div className="character-name">
+                      {selectedEnemyData?.name || "Unknown Enemy"}
+                    </div>
+                    <div className="character-level">
+                      Level{" "}
+                      {Math.round(
+                        (selectedEnemyData?.level || 1) *
+                          difficultyData.multiplier
+                      )}
+                    </div>
+                    <div className="character-stats-mini">
+                      <div className="mini-stat">
+                        <span>HP</span>
+                        <span>
+                          {Math.round(
+                            (selectedEnemyData?.hp || 80) *
+                              difficultyData.multiplier
+                          )}
+                        </span>
+                      </div>
+                      <div className="mini-stat">
+                        <span>ATK</span>
+                        <span>
+                          {Math.round(
+                            (selectedEnemyData?.attack || 20) *
+                              difficultyData.multiplier
+                          )}
+                        </span>
+                      </div>
+                      <div className="mini-stat">
+                        <span>DEF</span>
+                        <span>
+                          {Math.round(
+                            (selectedEnemyData?.defense || 10) *
+                              difficultyData.multiplier
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Simple Battle Phase (placeholder)
   return (
     <div className="battle-screen">
-      <button className="back-button" onClick={onBack}>
-        ← Back
-      </button>
-
-      {/* Battle Arena */}
-      <div className="battle-arena">
-        {/* Player Character */}
-        <div
-          className={`battle-character player ${
-            playerCharacter.animationType
-          } ${playerCharacter.isAnimating ? "animating" : ""}`}
-          style={{
-            left: `${playerCharacter.position.x}%`,
-            top: `${playerCharacter.position.y}%`,
-          }}
+      <div className="battle-header">
+        <button
+          className="back-button"
+          onClick={() =>
+            setBattleState((prev) => ({ ...prev, phase: "preparation" }))
+          }
         >
-          <div className="character-sprite">🦸‍♂️</div>
-          <div className="character-info">
-            <div className="character-name">{playerCharacter.name}</div>
-            <div className="hp-bar">
-              <div
-                className="hp-fill"
-                style={{ width: `${getHPPercentage(playerCharacter)}%` }}
-              ></div>
-              <span className="hp-text">
-                {playerCharacter.hp}/{playerCharacter.maxHp}
-              </span>
-            </div>
-            <div className="mp-bar">
-              <div
-                className="mp-fill"
-                style={{ width: `${getMPPercentage(playerCharacter)}%` }}
-              ></div>
-              <span className="mp-text">
-                {playerCharacter.mp}/{playerCharacter.maxMp}
-              </span>
-            </div>
+          ← Back to Preparation
+        </button>
+
+        <div className="battle-info">
+          <div className="turn-indicator">
+            <strong>Turn {battleState.turnCount}</strong>
           </div>
-        </div>
-
-        {/* Enemy Character */}
-        <div
-          className={`battle-character enemy ${enemyCharacter.animationType} ${
-            enemyCharacter.isAnimating ? "animating" : ""
-          }`}
-          style={{
-            left: `${enemyCharacter.position.x}%`,
-            top: `${enemyCharacter.position.y}%`,
-          }}
-        >
-          <div className="character-sprite">👹</div>
-          <div className="character-info">
-            <div className="character-name">{enemyCharacter.name}</div>
-            <div className="hp-bar">
-              <div
-                className="hp-fill"
-                style={{ width: `${getHPPercentage(enemyCharacter)}%` }}
-              ></div>
-              <span className="hp-text">
-                {enemyCharacter.hp}/{enemyCharacter.maxHp}
-              </span>
-            </div>
-            <div className="mp-bar">
-              <div
-                className="mp-fill"
-                style={{ width: `${getMPPercentage(enemyCharacter)}%` }}
-              ></div>
-              <span className="mp-text">
-                {enemyCharacter.mp}/{enemyCharacter.maxMp}
-              </span>
-            </div>
+          <div
+            className={`turn-indicator ${
+              battleState.turn === "enemy" ? "enemy-turn" : ""
+            }`}
+          >
+            {battleState.turn === "player" ? "🛡️ Your Turn" : "⚔️ Enemy Turn"}
           </div>
         </div>
       </div>
 
-      {/* Battle UI */}
-      <div className="battle-ui">
-        {/* Battle Log */}
-        <div className="battle-log">
-          <h4>📜 Battle Log</h4>
-          <div className="log-content">
-            {battleState.battleLog.slice(-5).map((log, index) => (
+      <div className="battle-arena">
+        <div className="battle-field">
+          <div className="characters-display">
+            {/* Player Team */}
+            <div className="team-section">
+              <h3 className="team-title">🛡️ Your Team</h3>
+              <div className="character-list">
+                {playerCharacters.map((character, index) => (
+                  <div
+                    key={character.id}
+                    className={`battle-character ${
+                      index === currentPlayerIndex &&
+                      battleState.turn === "player"
+                        ? "active"
+                        : ""
+                    } ${character.hp <= 0 ? "dead" : ""}`}
+                  >
+                    <div className="character-header">
+                      <div className="character-avatar">
+                        {character.artwork?.icon || "🦸‍♂️"}
+                      </div>
+                      <div className="character-info">
+                        <div className="character-name">{character.name}</div>
+                        <div className="character-level">
+                          Level {character.level}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="health-bar-container">
+                      <div className="health-bar">
+                        <div
+                          className="health-fill"
+                          style={{
+                            width: `${(character.hp / character.maxHp) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <div className="bar-text">
+                        HP: {character.hp}/{character.maxHp}
+                      </div>
+                    </div>
+
+                    <div className="mana-bar">
+                      <div
+                        className="mana-fill"
+                        style={{
+                          width: `${(character.mp / character.maxMp) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <div className="bar-text">
+                      MP: {character.mp}/{character.maxMp}
+                    </div>
+
+                    <div className="character-stats">
+                      <div className="stat-item">ATK: {character.attack}</div>
+                      <div className="stat-item">DEF: {character.defense}</div>
+                      <div className="stat-item">SPD: {character.speed}</div>
+                      <div className="stat-item">
+                        ⚡{" "}
+                        {Math.floor(
+                          (character.hp +
+                            character.attack +
+                            character.defense) /
+                            3
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Enemy Team */}
+            <div className="team-section">
+              <h3 className="team-title enemy-title">⚔️ Enemies</h3>
+              <div className="character-list">
+                {ENEMY_TYPES.filter(
+                  (e) => e.id === battleState.selectedEnemy
+                ).map((enemy) => {
+                  const difficultyData =
+                    DIFFICULTY_SETTINGS[battleState.selectedDifficulty];
+                  const enemyHp = Math.round(
+                    enemy.hp * difficultyData.multiplier
+                  );
+                  const enemyMp = Math.round(
+                    enemy.mp * difficultyData.multiplier
+                  );
+
+                  return (
+                    <div
+                      key={enemy.id}
+                      className={`battle-character ${
+                        battleState.turn === "enemy" ? "active" : ""
+                      }`}
+                    >
+                      <div className="character-header">
+                        <div className="character-avatar">{enemy.icon}</div>
+                        <div className="character-info">
+                          <div className="character-name">{enemy.name}</div>
+                          <div className="character-level">
+                            Level{" "}
+                            {Math.round(
+                              enemy.level * difficultyData.multiplier
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="health-bar-container">
+                        <div className="health-bar">
+                          <div
+                            className="health-fill"
+                            style={{ width: "100%" }}
+                          ></div>
+                        </div>
+                        <div className="bar-text">
+                          HP: {enemyHp}/{enemyHp}
+                        </div>
+                      </div>
+
+                      <div className="mana-bar">
+                        <div
+                          className="mana-fill"
+                          style={{ width: "100%" }}
+                        ></div>
+                      </div>
+                      <div className="bar-text">
+                        MP: {enemyMp}/{enemyMp}
+                      </div>
+
+                      <div className="character-stats">
+                        <div className="stat-item">
+                          ATK:{" "}
+                          {Math.round(enemy.attack * difficultyData.multiplier)}
+                        </div>
+                        <div className="stat-item">
+                          DEF:{" "}
+                          {Math.round(
+                            enemy.defense * difficultyData.multiplier
+                          )}
+                        </div>
+                        <div className="stat-item">SPD: {enemy.speed}</div>
+                        <div className="stat-item">
+                          ⚡{" "}
+                          {Math.round(
+                            (enemyHp + enemy.attack + enemy.defense) / 3
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Battle Log */}
+          <div className="battle-log">
+            <div className="log-title">📜 Battle Log</div>
+            {battleState.battleLog.map((entry, index) => (
               <div key={index} className="log-entry">
-                {log}
+                {entry}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Action Buttons */}
-        {battleState.phase === "battle" &&
-          battleState.turn === "player" &&
-          !battleState.isProcessing && (
-            <div className="battle-actions">
-              <button className="action-btn attack-btn" onClick={handleAttack}>
-                ⚔️ Attack
-              </button>
+        {/* Actions Panel */}
+        <div className="actions-panel">
+          <div className="actions-title">⚡ Battle Actions</div>
 
-              <div className="skills-section">
-                <h5>✨ Skills</h5>
-                <div className="skills-grid">
-                  {playerCharacter.skills.map((skill) => (
-                    <button
-                      key={skill.id}
-                      className={`skill-btn ${
-                        playerCharacter.mp < skill.mpCost ? "disabled" : ""
-                      }`}
-                      onClick={() => handleSkill(skill)}
-                      disabled={playerCharacter.mp < skill.mpCost}
-                      title={skill.description}
-                    >
-                      {skill.name}
-                      <span className="mp-cost">({skill.mpCost} MP)</span>
-                    </button>
-                  ))}
+          {battleState.turn === "player" && !battleState.isProcessing && (
+            <>
+              {!battleState.selectedAction && (
+                <div className="action-buttons">
+                  <button
+                    className="action-btn attack"
+                    onClick={() =>
+                      setBattleState((prev) => ({
+                        ...prev,
+                        selectedAction: "attack",
+                      }))
+                    }
+                    disabled={playerCharacters[currentPlayerIndex]?.hp <= 0}
+                  >
+                    ⚔️ Attack
+                  </button>
+                  <button
+                    className="action-btn skill"
+                    onClick={() =>
+                      setBattleState((prev) => ({
+                        ...prev,
+                        selectedAction: "skill",
+                      }))
+                    }
+                    disabled={playerCharacters[currentPlayerIndex]?.hp <= 0}
+                  >
+                    ✨ Use Skill
+                  </button>
+                  <button
+                    className="action-btn defend"
+                    onClick={() =>
+                      setBattleState((prev) => ({
+                        ...prev,
+                        selectedAction: "defend",
+                      }))
+                    }
+                    disabled={playerCharacters[currentPlayerIndex]?.hp <= 0}
+                  >
+                    🛡️ Defend
+                  </button>
                 </div>
-              </div>
+              )}
 
-              <button className="action-btn defend-btn" onClick={handleDefend}>
-                🛡️ Defend
-              </button>
+              {battleState.selectedAction === "skill" && (
+                <>
+                  <div className="skills-list">
+                    {playerCharacters[currentPlayerIndex]?.skills.map(
+                      (skill) => (
+                        <button
+                          key={skill.id}
+                          className="skill-btn"
+                          onClick={() =>
+                            setBattleState((prev) => ({
+                              ...prev,
+                              selectedSkill: skill,
+                            }))
+                          }
+                          disabled={
+                            playerCharacters[currentPlayerIndex].mp <
+                            skill.mpCost
+                          }
+                        >
+                          <div className="skill-name">{skill.name}</div>
+                          <div className="skill-info">
+                            MP: {skill.mpCost} | {skill.description}
+                          </div>
+                        </button>
+                      )
+                    )}
+                  </div>
+                  <button
+                    className="action-btn"
+                    onClick={() =>
+                      setBattleState((prev) => ({
+                        ...prev,
+                        selectedAction: null,
+                        selectedSkill: null,
+                      }))
+                    }
+                  >
+                    ← Back to Actions
+                  </button>
+                </>
+              )}
+
+              {(battleState.selectedAction === "attack" ||
+                battleState.selectedSkill) && (
+                <>
+                  <div className="targets-section">
+                    <div className="targets-title">🎯 Select Target</div>
+                    <div className="target-buttons">
+                      {ENEMY_TYPES.filter(
+                        (e) => e.id === battleState.selectedEnemy
+                      ).map((enemy) => (
+                        <button key={enemy.id} className="target-btn">
+                          {enemy.icon} {enemy.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    className="execute-btn"
+                    onClick={() => {
+                      // Execute action
+                      const currentChar = playerCharacters[currentPlayerIndex];
+                      const actionText =
+                        battleState.selectedAction === "attack"
+                          ? `${currentChar.name} attacks ${
+                              ENEMY_TYPES.find(
+                                (e) => e.id === battleState.selectedEnemy
+                              )?.name
+                            }!`
+                          : battleState.selectedSkill
+                          ? `${currentChar.name} uses ${battleState.selectedSkill.name}!`
+                          : `${currentChar.name} defends!`;
+
+                      setBattleState((prev) => ({
+                        ...prev,
+                        battleLog: [...prev.battleLog, actionText],
+                        selectedAction: null,
+                        selectedSkill: null,
+                        turn: "enemy",
+                        turnCount: prev.turnCount + 1,
+                        isProcessing: true,
+                      }));
+
+                      // Simulate enemy turn after delay
+                      setTimeout(() => {
+                        const enemyAction = `${
+                          ENEMY_TYPES.find(
+                            (e) => e.id === battleState.selectedEnemy
+                          )?.name
+                        } attacks ${currentChar.name}!`;
+                        setBattleState((prev) => ({
+                          ...prev,
+                          battleLog: [...prev.battleLog, enemyAction],
+                          turn: "player",
+                          isProcessing: false,
+                        }));
+                      }, 2000);
+                    }}
+                  >
+                    ⚡ Execute Action
+                  </button>
+
+                  <button
+                    className="action-btn"
+                    onClick={() =>
+                      setBattleState((prev) => ({
+                        ...prev,
+                        selectedAction: null,
+                        selectedSkill: null,
+                      }))
+                    }
+                  >
+                    ← Back to Actions
+                  </button>
+                </>
+              )}
+            </>
+          )}
+
+          {battleState.turn === "enemy" && (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              <div style={{ fontSize: "18px", marginBottom: "10px" }}>
+                ⚔️ Enemy Turn
+              </div>
+              <div style={{ fontSize: "14px", opacity: "0.8" }}>
+                The enemy is thinking...
+              </div>
             </div>
           )}
 
-        {/* Battle Result */}
-        {(battleState.phase === "victory" ||
-          battleState.phase === "defeat") && (
-          <div className="battle-result">
-            <h3>
+          {battleState.isProcessing && (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              <div style={{ fontSize: "18px", marginBottom: "10px" }}>
+                ⚡ Processing...
+              </div>
+              <div style={{ fontSize: "14px", opacity: "0.8" }}>
+                Action in progress...
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Battle End Modal */}
+      {(battleState.phase === "victory" || battleState.phase === "defeat") && (
+        <div className="battle-end">
+          <div className="battle-end-content">
+            <div
+              className={`battle-end-title ${
+                battleState.phase === "victory" ? "victory" : "defeat"
+              }`}
+            >
               {battleState.phase === "victory" ? "🎉 Victory!" : "💀 Defeat!"}
-            </h3>
+            </div>
             <p>
               {battleState.phase === "victory"
-                ? "You have defeated the enemy! Gained 50 EXP and 100 coins!"
-                : "You have been defeated. Better luck next time!"}
+                ? "Congratulations! You have defeated your enemies!"
+                : "Your team has been defeated. Better luck next time!"}
             </p>
-            <button className="result-btn" onClick={onBack}>
-              Return to Dashboard
+            <button
+              className="battle-end-btn"
+              onClick={() =>
+                setBattleState((prev) => ({
+                  ...prev,
+                  phase: "character_selection",
+                }))
+              }
+            >
+              Return to Character Selection
             </button>
           </div>
-        )}
-
-        {/* Processing Indicator */}
-        {battleState.isProcessing && (
-          <div className="processing-indicator">
-            <div className="spinner"></div>
-            <p>Processing turn...</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

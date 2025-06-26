@@ -211,11 +211,8 @@ export const inventoryAPI = {
       }
     );
 
-    if (response.success) {
-      return response.data;
-    } else {
-      throw new Error(response.message || "Failed to get characters grid");
-    }
+    // Backend returns data directly, not wrapped in {success, data}
+    return response;
   },
 
   getCharacterDetail: async (
@@ -225,10 +222,10 @@ export const inventoryAPI = {
     const response = await apiRequest<any>(
       `${API_ENDPOINTS.GAME.INVENTORY}/character/${characterId}`,
       {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
@@ -243,10 +240,10 @@ export const inventoryAPI = {
     const response = await apiRequest<any>(
       `${API_ENDPOINTS.GAME.INVENTORY}/pets`,
       {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
@@ -261,10 +258,10 @@ export const inventoryAPI = {
     const response = await apiRequest<any>(
       `${API_ENDPOINTS.GAME.INVENTORY}/items`,
       {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 

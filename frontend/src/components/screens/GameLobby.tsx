@@ -434,6 +434,9 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
         <button className="menu-button" onClick={() => onNavigate("inventory")}>
           🎒
         </button>
+        <button className="menu-button" onClick={() => onNavigate("battle")}>
+          ⚔️
+        </button>
         <button className="menu-button" onClick={() => onNavigate("settings")}>
           ⚙️
         </button>
