@@ -61,4 +61,3 @@ Bun.serve({
 });
 
 console.log(`🎮 Idle: Picoen Frontend running at http://localhost:${port}`);
- 

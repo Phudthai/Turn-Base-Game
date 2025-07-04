@@ -1,7 +1,7 @@
 .battle-screen {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  padding: 20px;
+  padding: 0;
   color: white;
   font-family: "Arial", sans-serif;
 }
@@ -10,34 +10,46 @@
 .battle-screen .battle-header {
   display: flex;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1rem 0;
   background: rgba(0, 0, 0, 0.3);
   border-bottom: 2px solid #4a90e2;
   backdrop-filter: blur(10px);
   margin-bottom: 20px;
   position: relative;
+  flex-shrink: 0;
+  width: 100%;
 }
 
-/* Battle Phase Header - Different styling for actual battle */
-.battle-screen .battle-header:has(.battle-info) {
-  background: transparent;
-  border-bottom: none;
-  backdrop-filter: none;
-  padding: 1rem 0;
-}
-
-.battle-info {
+.battle-screen .header-content {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Battle info ใช้เฉพาะใน actions panel */
+.actions-panel .battle-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .turn-indicator {
   background: rgba(255, 255, 255, 0.1);
-  padding: 10px 20px;
-  border-radius: 15px;
+  padding: 8px 16px;
+  border-radius: 12px;
   backdrop-filter: blur(10px);
   border: 2px solid #4ade80;
+  font-size: 14px;
 }
 
 .turn-indicator.enemy-turn {
@@ -50,6 +62,7 @@
   gap: 20px;
   max-width: 1400px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
 .battle-field {
@@ -436,13 +449,9 @@
 }
 
 .battle-screen .header-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 0 auto;
   text-align: center;
+  flex: 1;
 }
 
 .battle-screen .battle-title {
@@ -488,11 +497,12 @@
 
 /* Battle Preparation Phase Styles */
 .battle-preparation {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 30px;
+  padding: 20px;
 }
 
 .preparation-top-row {
@@ -509,6 +519,8 @@
   padding: 30px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .battle-formation {
@@ -517,6 +529,8 @@
   padding: 30px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .preparation-section {
@@ -788,7 +802,7 @@
     padding: 15px;
     gap: 20px;
   }
-  
+
   .player-team-row {
     grid-template-columns: 1fr;
     gap: 15px;

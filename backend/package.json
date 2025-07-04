@@ -18,7 +18,9 @@
     "jose": "^6.0.11",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
-    "nanoid": "^5.1.5"
+    "nanoid": "^5.1.5",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",
