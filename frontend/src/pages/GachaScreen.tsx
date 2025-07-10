@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { useGameAPI } from "../../hooks/useGameAPI";
+import { useAuth } from "../context/AuthContext";
+import { useGameAPI } from "../hooks/useGameAPI";
 import type {
-  GachaPullResponse,
-  GachaPull,
-  MultiGachaPull,
-} from "../../types/types";
+  GachaResponse,
+  GachaItem,
+  GachaHistoryResponse,
+} from "../types/types";
 
 interface GachaScreenProps {
   onBack: () => void;
@@ -36,8 +36,9 @@ interface Banner {
 type PullType = "single" | "multi";
 
 export function GachaScreen({ onBack }: GachaScreenProps) {
-  const [lastPullResult, setLastPullResult] =
-    useState<GachaPullResponse | null>(null);
+  const [lastPullResult, setLastPullResult] = useState<GachaResponse | null>(
+    null
+  );
   const [pullType, setPullType] = useState<PullType>("single");
   const [selectedBanner, setSelectedBanner] =
     useState<string>("standard_banner");
@@ -201,9 +202,7 @@ export function GachaScreen({ onBack }: GachaScreenProps) {
     return "Standard rates for all items";
   };
 
-  const isMultiPull = (
-    pull: GachaPull | MultiGachaPull
-  ): pull is MultiGachaPull => {
+  const isMultiPull = (pull: GachaResponse): pull is GachaHistoryResponse => {
     return "pulls" in pull;
   };
 

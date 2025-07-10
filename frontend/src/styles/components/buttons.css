@@ -1,0 +1,499 @@
+/* BUTTON COMPONENT STYLES */
+
+/* Base Button Styles */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.btn:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Primary Button (Login Submit) */
+.submit-button {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.submit-button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+/* Gacha Buttons */
+.gacha-button {
+  background: linear-gradient(45deg, #4a90e2, #357abd);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 150px;
+}
+
+.gacha-button.single {
+  background: linear-gradient(45deg, #4a90e2, #357abd);
+}
+
+.gacha-button.multi {
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+}
+
+.gacha-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+}
+
+.gacha-button.multi:hover:not(:disabled) {
+  box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+}
+
+.gacha-button:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Action Buttons (Settings) */
+.action-button {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  padding: 15px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+}
+
+.action-button.change-password:hover {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.3), rgba(52, 152, 219, 0.2));
+  border-color: rgba(52, 152, 219, 0.5);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.action-button.export-data:hover,
+.action-button.import-data:hover {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.3), rgba(46, 204, 113, 0.2));
+  border-color: rgba(46, 204, 113, 0.5);
+  box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+}
+
+.action-button.reset-progress:hover {
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.3), rgba(230, 126, 34, 0.2));
+  border-color: rgba(230, 126, 34, 0.5);
+  box-shadow: 0 8px 25px rgba(230, 126, 34, 0.3);
+}
+
+.action-button.logout:hover {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.3), rgba(231, 76, 60, 0.2));
+  border-color: rgba(231, 76, 60, 0.5);
+  box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+}
+
+/* Menu Buttons (Lobby) */
+.menu-button {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.8), rgba(0, 242, 254, 0.6));
+}
+
+.menu-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Battle Buttons */
+.start-battle-button {
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.start-battle-button:hover:not(:disabled) {
+  background: linear-gradient(45deg, #c0392b, #a93226);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.start-battle-button:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Switch Mode Button (Login) */
+.switch-mode-button {
+  background: none;
+  border: 1px solid rgba(78, 205, 196, 0.5);
+  color: #4ecdc4;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.switch-mode-button:hover:not(:disabled) {
+  background: rgba(78, 205, 196, 0.1);
+  border-color: #4ecdc4;
+}
+
+.switch-mode-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Password Toggle Button */
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.password-toggle:hover:not(:disabled) {
+  color: #4ecdc4;
+  background: rgba(78, 205, 196, 0.1);
+}
+
+.password-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Filter Buttons */
+.filter-toggle-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.filter-toggle-btn:hover {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: #4ecdc4;
+  color: #4ecdc4;
+}
+
+.filter-toggle-btn.active {
+  background: rgba(78, 205, 196, 0.3);
+  border-color: #4ecdc4;
+  color: #4ecdc4;
+}
+
+/* Grade Filter Buttons */
+.grade-filter-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  min-width: 60px;
+}
+
+.grade-filter-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.grade-filter-btn.ssr {
+  border-color: rgba(255, 149, 0, 0.5);
+  color: #ff9500;
+}
+
+.grade-filter-btn.ssr:hover,
+.grade-filter-btn.ssr.active {
+  background: rgba(255, 149, 0, 0.2);
+  border-color: #ff9500;
+  box-shadow: 0 3px 15px rgba(255, 149, 0, 0.4);
+}
+
+.grade-filter-btn.sr {
+  border-color: rgba(0, 122, 255, 0.5);
+  color: #007aff;
+}
+
+.grade-filter-btn.sr:hover,
+.grade-filter-btn.sr.active {
+  background: rgba(0, 122, 255, 0.2);
+  border-color: #007aff;
+  box-shadow: 0 3px 15px rgba(0, 122, 255, 0.4);
+}
+
+.grade-filter-btn.r {
+  border-color: rgba(142, 142, 147, 0.5);
+  color: #8e8e93;
+}
+
+.grade-filter-btn.r:hover,
+.grade-filter-btn.r.active {
+  background: rgba(142, 142, 147, 0.2);
+  border-color: #8e8e93;
+  box-shadow: 0 3px 15px rgba(142, 142, 147, 0.4);
+}
+
+/* Sort Order Button */
+.sort-order-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sort-order-btn:hover {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: #4ecdc4;
+  color: #4ecdc4;
+}
+
+.sort-order-btn.asc {
+  color: #4caf50;
+  border-color: rgba(76, 175, 80, 0.5);
+}
+
+.sort-order-btn.desc {
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+/* View Mode Buttons */
+.view-mode-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-mode-btn:hover {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: #4ecdc4;
+  color: #4ecdc4;
+}
+
+.view-mode-btn.active {
+  background: rgba(78, 205, 196, 0.3);
+  border-color: #4ecdc4;
+  color: #4ecdc4;
+}
+
+/* Button Content & Loading */
+.button-content, .loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.button-icon {
+  font-size: 1.2rem;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .submit-button {
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .gacha-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    min-width: 120px;
+  }
+  
+  .action-button {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .menu-button {
+    width: 50px;
+    height: 50px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .submit-button {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.95rem;
+  }
+  
+  .gacha-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.85rem;
+    min-width: 100px;
+  }
+  
+  .action-button {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+  
+  .menu-button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+  
+  .grade-filter-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    min-width: 50px;
+  }
+} 

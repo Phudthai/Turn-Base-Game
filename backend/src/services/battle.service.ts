@@ -13,6 +13,30 @@ import { BattleRewardsService } from "./battle-rewards.service";
 // In-memory store for active battles
 const activeBattles = new Map<string, BattleState>();
 
+// Difficulty settings that match frontend
+const DIFFICULTY_SETTINGS = {
+  easy: {
+    multiplier: 0.8,
+    rewards: 0.8,
+    description: "Easy enemies with reduced stats",
+  },
+  normal: {
+    multiplier: 1.0,
+    rewards: 1.0,
+    description: "Standard difficulty",
+  },
+  hard: {
+    multiplier: 1.3,
+    rewards: 1.5,
+    description: "Stronger enemies with increased rewards",
+  },
+  nightmare: {
+    multiplier: 1.6,
+    rewards: 2.0,
+    description: "Extremely challenging battles",
+  },
+};
+
 // Enhanced Enemy AI Types
 export enum AIStrategy {
   AGGRESSIVE = "aggressive", // Always attack strongest target
@@ -22,44 +46,12 @@ export enum AIStrategy {
   SUPPORT = "support", // Focus on buffing allies
 }
 
-// Enemy templates with AI strategies
-const ENEMY_TEMPLATES = {
-  goblin_warrior: {
-    name: "Goblin Warrior",
-    aiStrategy: AIStrategy.AGGRESSIVE,
-    stats: { hp: 120, attack: 65, defense: 30, speed: 50 },
-    skills: ["slash", "rage"],
-  },
-  orc_shaman: {
-    name: "Orc Shaman",
-    aiStrategy: AIStrategy.SUPPORT,
-    stats: { hp: 90, attack: 45, defense: 40, speed: 35 },
-    skills: ["heal", "buff", "lightning_bolt"],
-  },
-  undead_knight: {
-    name: "Undead Knight",
-    aiStrategy: AIStrategy.DEFENSIVE,
-    stats: { hp: 180, attack: 70, defense: 60, speed: 25 },
-    skills: ["dark_strike", "shield_wall", "life_drain"],
-  },
-  dragon_whelp: {
-    name: "Dragon Whelp",
-    aiStrategy: AIStrategy.BERSERKER,
-    stats: { hp: 200, attack: 85, defense: 45, speed: 40 },
-    skills: ["fire_breath", "tail_sweep", "wing_attack"],
-  },
-  forest_elemental: {
-    name: "Forest Elemental",
-    aiStrategy: AIStrategy.TACTICAL,
-    stats: { hp: 100, attack: 55, defense: 50, speed: 60 },
-    skills: ["nature_bind", "thorn_volley", "regeneration"],
-  },
-};
-
 export class BattleService {
   static async createBattle(
     userId: string,
-    playerCharacterIds: string[]
+    playerCharacterIds: string[],
+    difficulty: "easy" | "normal" | "hard" | "nightmare" = "normal",
+    selectedEnemy: string = "char_r_001" // Default to first character
   ): Promise<BattleState> {
     try {
       // Get user characters from database
@@ -82,7 +74,7 @@ export class BattleService {
             (t) => t.id === userChar.characterId
           );
 
-          return {
+          const battleChar = {
             id: userChar._id.toString(),
             name: template?.name || userChar.characterId,
             level: userChar.level,
@@ -103,6 +95,7 @@ export class BattleService {
                 damage: 100 + userChar.level * 10,
                 energyCost: skill.manaCost || 20,
                 cooldown: skill.cooldown || 3,
+                currentCooldown: 0,
                 targeting: "single" as const,
               })) || [],
             statusEffects: [],
@@ -111,11 +104,25 @@ export class BattleService {
             position: index + 1,
             isPlayer: true,
           };
+          return battleChar;
         }
       );
+      // LOG: Player characters and their skills
+      console.log(
+        "[BATTLE] Player characters in battle:",
+        playerCharacters.map((c) => ({
+          id: c.id,
+          characterId: c.characterId,
+          skills: c.skills.map((s) => s.id),
+        }))
+      );
 
-      // Create enhanced enemies based on player level
-      const enemies = this.generateEnemies(playerCharacters);
+      // Create enemies based on selected enemy character and difficulty
+      const enemies = await this.generateEnemiesFromCharacter(
+        selectedEnemy,
+        difficulty,
+        playerCharacters
+      );
 
       const battleState: BattleState = {
         id: nanoid(),
@@ -128,13 +135,34 @@ export class BattleService {
         maxTurns: 50,
         battleRewards: this.calculatePotentialRewards(
           playerCharacters,
-          enemies
+          enemies,
+          difficulty
         ),
+        difficulty,
+        battleType: "pve",
+        selectedEnemy,
+        startTime: new Date(),
       };
 
       // Calculate initial turn order based on speed
       battleState.turnOrder = this.calculateTurnOrder(battleState.characters);
       battleState.status = "in_progress";
+
+      // ถ้าเทิร์นแรกเป็นของ enemy ให้ AI ทำ action ทันที
+      const firstTurnId = battleState.turnOrder[0];
+      const firstChar = battleState.characters.find(
+        (c) => c.id === firstTurnId
+      );
+      if (firstChar && !firstChar.isPlayer) {
+        await this.processEnemyTurns(battleState);
+        // Re-calculate turn order and set turn to first player
+        battleState.turnOrder = this.calculateTurnOrder(battleState.characters);
+        const firstPlayerIdx = battleState.turnOrder.findIndex((id) => {
+          const chr = battleState.characters.find((c) => c.id === id);
+          return chr?.isPlayer;
+        });
+        battleState.currentTurn = firstPlayerIdx >= 0 ? firstPlayerIdx : 0;
+      }
 
       // Store battle state
       activeBattles.set(battleState.id, battleState);
@@ -144,6 +172,157 @@ export class BattleService {
       console.error("Error creating battle:", error);
       throw error;
     }
+  }
+
+  private static async generateEnemiesFromCharacter(
+    enemyCharacterId: string,
+    difficulty: "easy" | "normal" | "hard" | "nightmare",
+    playerCharacters: BattleCharacter[]
+  ): Promise<BattleCharacter[]> {
+    try {
+      // Get character template from database
+      const enemyTemplate = await Character.findOne({ id: enemyCharacterId });
+      if (!enemyTemplate) {
+        throw new Error(`Character with id ${enemyCharacterId} not found`);
+      }
+
+      const difficultyData = DIFFICULTY_SETTINGS[difficulty];
+      const avgPlayerLevel = Math.floor(
+        playerCharacters.reduce((sum, char) => sum + char.level, 0) /
+          playerCharacters.length
+      );
+
+      // Scale enemy based on player level and difficulty
+      const levelMultiplier = 1 + (avgPlayerLevel - 1) * 0.1;
+      const finalMultiplier = levelMultiplier * difficultyData.multiplier;
+
+      // Determine AI strategy based on character type
+      let aiStrategy = AIStrategy.AGGRESSIVE;
+      switch (enemyTemplate.characterType) {
+        case "tank":
+          aiStrategy = AIStrategy.DEFENSIVE;
+          break;
+        case "healer":
+          aiStrategy = AIStrategy.SUPPORT;
+          break;
+        case "assassin":
+          aiStrategy = AIStrategy.TACTICAL;
+          break;
+        case "mage":
+          aiStrategy = AIStrategy.BERSERKER;
+          break;
+        default:
+          aiStrategy = AIStrategy.AGGRESSIVE;
+      }
+
+      const enemy: BattleCharacter = {
+        id: `enemy_${enemyTemplate.id}`,
+        name: enemyTemplate.name,
+        level: Math.max(1, Math.round((avgPlayerLevel + 2) * levelMultiplier)),
+        stats: {
+          hp: Math.round(enemyTemplate.baseStats.hp * finalMultiplier),
+          maxHp: Math.round(enemyTemplate.baseStats.hp * finalMultiplier),
+          attack: Math.round(enemyTemplate.baseStats.attack * finalMultiplier),
+          defense: Math.round(
+            enemyTemplate.baseStats.defense * finalMultiplier
+          ),
+          speed: Math.round(
+            enemyTemplate.baseStats.speed * (1 + (finalMultiplier - 1) * 0.5)
+          ), // Speed scales less
+          critRate: Math.min(
+            50,
+            enemyTemplate.baseStats.critRate + difficulty === "nightmare"
+              ? 10
+              : 5
+          ),
+          critDamage: Math.min(
+            300,
+            enemyTemplate.baseStats.critDamage + difficulty === "nightmare"
+              ? 50
+              : 20
+          ),
+        },
+        skills: enemyTemplate.skills.map((skill) => ({
+          id: skill.id,
+          name: skill.name,
+          description: skill.description,
+          damage: Math.round(
+            (enemyTemplate.baseStats.attack + (skill.manaCost || 20) * 2) *
+              finalMultiplier
+          ),
+          energyCost: skill.manaCost || 20,
+          cooldown: skill.cooldown || 2,
+          currentCooldown: 0,
+          targeting:
+            skill.name.toLowerCase().includes("all") ||
+            skill.name.toLowerCase().includes("area")
+              ? "all"
+              : "single",
+        })),
+        statusEffects: [],
+        currentEnergy: Math.round(
+          enemyTemplate.baseStats.hp * 0.4 * finalMultiplier
+        ),
+        maxEnergy: Math.round(
+          enemyTemplate.baseStats.hp * 0.4 * finalMultiplier
+        ),
+        position: 1,
+        isPlayer: false,
+        aiStrategy: aiStrategy,
+      };
+
+      return [enemy];
+    } catch (error) {
+      console.error("Error generating enemy from character:", error);
+      // Fallback to a basic enemy if character not found
+      return this.generateFallbackEnemy(difficulty, playerCharacters);
+    }
+  }
+
+  private static generateFallbackEnemy(
+    difficulty: "easy" | "normal" | "hard" | "nightmare",
+    playerCharacters: BattleCharacter[]
+  ): BattleCharacter[] {
+    const difficultyData = DIFFICULTY_SETTINGS[difficulty];
+    const avgPlayerLevel = Math.floor(
+      playerCharacters.reduce((sum, char) => sum + char.level, 0) /
+        playerCharacters.length
+    );
+
+    const enemy: BattleCharacter = {
+      id: "enemy_basic",
+      name: "Unknown Warrior",
+      level: avgPlayerLevel,
+      stats: {
+        hp: Math.round(600 * difficultyData.multiplier),
+        maxHp: Math.round(600 * difficultyData.multiplier),
+        attack: Math.round(80 * difficultyData.multiplier),
+        defense: Math.round(60 * difficultyData.multiplier),
+        speed: 70,
+        critRate: 8,
+        critDamage: 130,
+      },
+      skills: [
+        {
+          id: "basic_attack",
+          name: "⚔️ Basic Attack",
+          description: "Simple attack",
+          damage: Math.round(80 * difficultyData.multiplier),
+          energyCost: 0,
+          cooldown: 1,
+          currentCooldown: 0,
+          targeting: "single",
+        },
+      ],
+      statusEffects: [],
+      currentEnergy: 100,
+      maxEnergy: 100,
+      position: 1,
+      isPlayer: false,
+      aiStrategy: AIStrategy.AGGRESSIVE,
+    };
+
+    return [enemy];
   }
 
   private static generateEnemies(
@@ -252,8 +431,10 @@ export class BattleService {
 
   private static calculatePotentialRewards(
     players: BattleCharacter[],
-    enemies: BattleCharacter[]
+    enemies: BattleCharacter[],
+    difficulty: "easy" | "normal" | "hard" | "nightmare"
   ) {
+    const difficultyData = DIFFICULTY_SETTINGS[difficulty];
     const totalEnemyLevel = enemies.reduce(
       (sum, enemy) => sum + enemy.level,
       0
@@ -263,8 +444,12 @@ export class BattleService {
     );
 
     return {
-      experience: Math.floor(totalEnemyLevel * 25 + Math.random() * 50),
-      coins: Math.floor(totalEnemyLevel * 15 + Math.random() * 30),
+      experience: Math.floor(
+        totalEnemyLevel * 25 * difficultyData.rewards + Math.random() * 50
+      ),
+      coins: Math.floor(
+        totalEnemyLevel * 15 * difficultyData.rewards + Math.random() * 30
+      ),
       items: Math.random() > 0.7 ? ["enhancement_stone", "health_potion"] : [],
       equipments: Math.random() > 0.9 ? ["common_sword"] : [],
     };
@@ -300,6 +485,11 @@ export class BattleService {
     );
 
     if (!actor || targets.length === 0) {
+      console.error("[BATTLE] Invalid actor or targets", {
+        action,
+        actor,
+        targets,
+      });
       throw new Error("Invalid actor or targets");
     }
 
@@ -309,8 +499,22 @@ export class BattleService {
     if (action.type === "basic_attack") {
       result = this.processBasicAttack(actor, targets[0]);
     } else if (action.type === "skill") {
+      // LOG: Skill search
+      console.log(
+        "[BATTLE] performAction: actor=",
+        actor.name,
+        "actor.skills=",
+        actor.skills.map((s) => s.id),
+        "action.skillId=",
+        action.skillId
+      );
       const skill = actor.skills.find((s) => s.id === action.skillId);
       if (!skill) {
+        console.error("[BATTLE] Skill not found", {
+          actor: actor.name,
+          skillIds: actor.skills.map((s) => s.id),
+          actionSkillId: action.skillId,
+        });
         throw new Error("Skill not found");
       }
       if (actor.currentEnergy < skill.energyCost) {

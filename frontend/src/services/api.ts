@@ -163,6 +163,18 @@ export const gameAPI = {
       headers,
     });
   },
+
+  // Get active gacha banners
+  getBannersActive: async (token?: string): Promise<any> => {
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    return apiRequest<any>(API_ENDPOINTS.GAME.GACHA_BANNERS_ACTIVE, {
+      method: "GET",
+      headers,
+    });
+  },
 };
 
 // Inventory API services
@@ -406,13 +418,35 @@ export const dataAPI = {
 
 // Battle API services
 export const battleAPI = {
-  startBattle: async (token: string, characterIds: string[]): Promise<any> => {
+  // Get available enemies for battle preparation (public)
+  getAvailableEnemies: async (): Promise<any> => {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.BATTLE}/enemies`, {
+      method: "GET",
+    });
+  },
+
+  // Get difficulty settings (public)
+  getDifficultySettings: async (): Promise<any> => {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.BATTLE}/difficulties`, {
+      method: "GET",
+    });
+  },
+
+  startBattle: async (
+    token: string,
+    data: {
+      characterIds: string[];
+      difficulty?: "easy" | "normal" | "hard" | "nightmare";
+      battleType?: "pve" | "pvp" | "boss" | "dungeon";
+      selectedEnemy?: string;
+    }
+  ): Promise<any> => {
     return apiRequest<any>(`${API_ENDPOINTS.GAME.BATTLE}/start`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ characterIds }),
+      body: JSON.stringify(data),
     });
   },
 
@@ -434,8 +468,202 @@ export const battleAPI = {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(action),
+    });
+  },
+
+  completeBattle: async (token: string, battleId: string): Promise<any> => {
+    return apiRequest<any>(
+      `${API_ENDPOINTS.GAME.BATTLE}/${battleId}/complete`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+
+  getBattleRewards: async (token: string, battleId: string): Promise<any> => {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.BATTLE}/${battleId}/rewards`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getBattleStatistics: async (
+    token: string,
+    battleId: string
+  ): Promise<any> => {
+    return apiRequest<any>(
+      `${API_ENDPOINTS.GAME.BATTLE}/${battleId}/statistics`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+
+  // New: Abandon battle
+  abandonBattle: async (token: string, battleId: string): Promise<any> => {
+    return apiRequest<any>(`${API_ENDPOINTS.GAME.BATTLE}/${battleId}/abandon`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+};
+
+// Achievement API services
+export const achievementAPI = {
+  getCategories: async (token: string): Promise<any> => {
+    return apiRequest<any>("/api/achievements/categories", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getAllAchievements: async (
+    token: string,
+    queryParams?: string
+  ): Promise<any> => {
+    const url = queryParams
+      ? `/api/achievements?${queryParams}`
+      : "/api/achievements";
+    return apiRequest<any>(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getUserAchievements: async (
+    token: string,
+    queryParams?: string
+  ): Promise<any> => {
+    const url = queryParams
+      ? `/api/achievements/my?${queryParams}`
+      : "/api/achievements/my";
+    return apiRequest<any>(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getAchievementProgress: async (
+    token: string,
+    achievementId: string
+  ): Promise<any> => {
+    return apiRequest<any>(`/api/achievements/${achievementId}/progress`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  claimReward: async (token: string, achievementId: string): Promise<any> => {
+    return apiRequest<any>(`/api/achievements/${achievementId}/claim`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getLeaderboard: async (token: string, queryParams?: string): Promise<any> => {
+    const url = queryParams
+      ? `/api/achievements/leaderboard?${queryParams}`
+      : "/api/achievements/leaderboard";
+    return apiRequest<any>(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+};
+
+// Statistics API services
+export const statisticsAPI = {
+  getUserStatistics: async (token: string): Promise<any> => {
+    return apiRequest<any>("/api/statistics", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getBattleStatistics: async (
+    token: string,
+    queryParams?: string
+  ): Promise<any> => {
+    const url = queryParams
+      ? `/api/statistics/battles?${queryParams}`
+      : "/api/statistics/battles";
+    return apiRequest<any>(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getBattleHistory: async (
+    token: string,
+    queryParams?: string
+  ): Promise<any> => {
+    const url = queryParams
+      ? `/api/statistics/battles/history?${queryParams}`
+      : "/api/statistics/battles/history";
+    return apiRequest<any>(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getPerformanceAnalytics: async (
+    token: string,
+    queryParams?: string
+  ): Promise<any> => {
+    const url = queryParams
+      ? `/api/statistics/analytics?${queryParams}`
+      : "/api/statistics/analytics";
+    return apiRequest<any>(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getLeaderboards: async (
+    token: string,
+    queryParams?: string
+  ): Promise<any> => {
+    const url = queryParams
+      ? `/api/statistics/leaderboards?${queryParams}`
+      : "/api/statistics/leaderboards";
+    return apiRequest<any>(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
   },
 };

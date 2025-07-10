@@ -301,22 +301,22 @@ export class BattleRewardsService {
       }
 
       // Add coins to user
-      await UserService.addCurrency(userId, "coins", rewards.coins);
+      await UserService.addCurrency(userId, 0, rewards.coins);
 
       // Add items to inventory
       for (const itemId of rewards.items) {
-        await ItemService.addItemToUser(userId, itemId, 1);
+        await ItemService.addUserItem(userId, itemId, 1);
       }
 
       // Add equipments to inventory
       for (const equipmentId of rewards.equipments) {
-        await ItemService.addItemToUser(userId, equipmentId, 1);
+        await ItemService.addUserItem(userId, equipmentId, 1);
       }
 
       // Add rare drops
       if (rewards.rare_drops) {
         for (const rareItem of rewards.rare_drops) {
-          await ItemService.addItemToUser(userId, rareItem, 1);
+          await ItemService.addUserItem(userId, rareItem, 1);
         }
       }
 

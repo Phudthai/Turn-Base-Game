@@ -1,0 +1,266 @@
+/* LOGIN SCREEN STYLES */
+
+/* Login Screen - Enhanced Gaming Theme */
+.login-screen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 70%, #0f3460 100%);
+  color: white;
+}
+
+/* Game Header Section */
+.game-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeInDown 1s ease-out;
+  z-index: 2;
+  position: relative;
+}
+
+.game-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.logo-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.6));
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+.game-title {
+  font-family: 'Cinzel', serif;
+  margin: 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.title-primary {
+  display: block;
+  font-size: 4rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(78, 205, 196, 0.5);
+  animation: titleGlow 2s ease-in-out infinite alternate;
+  letter-spacing: 0.1em;
+}
+
+.title-secondary {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: #a8a8a8;
+  margin-top: 0.5rem;
+  letter-spacing: 0.2em;
+}
+
+.game-tagline {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  margin: 0;
+  animation: fadeIn 2s ease-out;
+}
+
+/* Login Card */
+.login-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 2;
+  animation: slideInUp 0.8s ease-out;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(45deg, rgba(78, 205, 196, 0.3), rgba(255, 107, 107, 0.3));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  z-index: -1;
+}
+
+/* Login Header */
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h2 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Form Styling */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Login Footer */
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.switch-mode-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Background Elements */
+.login-bg-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-element {
+  position: absolute;
+  color: rgba(78, 205, 196, 0.1);
+  font-size: 2rem;
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-element.element-1 {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.floating-element.element-2 {
+  top: 60%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+.floating-element.element-3 {
+  bottom: 30%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+.floating-element.element-4 {
+  top: 10%;
+  right: 30%;
+  animation-delay: 1s;
+}
+
+.floating-element.element-5 {
+  bottom: 10%;
+  right: 10%;
+  animation-delay: 3s;
+  font-size: 1.5rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .login-screen {
+    padding: 1rem;
+  }
+  
+  .title-primary {
+    font-size: 3rem;
+  }
+  
+  .login-card {
+    padding: 2rem;
+    max-width: 100%;
+  }
+  
+  .logo-icon {
+    font-size: 3rem;
+  }
+  
+  .floating-element {
+    font-size: 1.5rem;
+  }
+  
+  .game-header {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title-primary {
+    font-size: 2.5rem;
+  }
+  
+  .login-card {
+    padding: 1.5rem;
+  }
+  
+  .logo-icon {
+    font-size: 2.5rem;
+  }
+  
+  .game-header {
+    margin-bottom: 1rem;
+  }
+  
+  .login-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .submit-button {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .title-primary {
+    font-size: 2rem;
+  }
+  
+  .logo-icon {
+    font-size: 2rem;
+  }
+  
+  .login-card {
+    padding: 1rem;
+  }
+} 

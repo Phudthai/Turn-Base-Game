@@ -7,7 +7,14 @@ export interface ICharacter extends Document {
   name: string;
   rarity: "R" | "SR" | "SSR";
   element: "fire" | "water" | "earth" | "air" | "light" | "dark" | "neutral";
-  characterType: "warrior" | "mage" | "archer" | "healer" | "tank";
+  characterType:
+    | "warrior"
+    | "mage"
+    | "archer"
+    | "healer"
+    | "tank"
+    | "assassin"
+    | "summoner";
   baseStats: {
     hp: number;
     attack: number;
@@ -56,7 +63,15 @@ const CharacterSchema = new Schema<ICharacter>(
     },
     characterType: {
       type: String,
-      enum: ["warrior", "mage", "archer", "healer", "tank"],
+      enum: [
+        "warrior",
+        "mage",
+        "archer",
+        "healer",
+        "tank",
+        "assassin",
+        "summoner",
+      ],
       required: true,
     },
     baseStats: {

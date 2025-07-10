@@ -1,0 +1,212 @@
+/* GLOBAL STYLES */
+
+/* Reset Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body & Typography */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* App Layout */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #3a3a5c;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 10;
+}
+
+.app-header h1 {
+  font-size: 2rem;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { filter: drop-shadow(0 0 5px rgba(255, 107, 107, 0.5)); }
+  to { filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.8)); }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 1.1rem;
+  color: #4ecdc4;
+}
+
+/* App main content */
+.app-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  min-height: calc(100vh - 80px); /* Subtract header height */
+  position: relative;
+}
+
+.app-main.full-screen {
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: block; /* Override flex for lobby */
+  justify-content: unset;
+  align-items: unset;
+  min-height: unset;
+}
+
+/* Global Error Messages */
+.error-message {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid #ff6b6b;
+  border-radius: 10px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  color: #ff6b6b;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Global Back Button */
+.floating-back-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-back-button:hover {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: #4ecdc4;
+  transform: scale(1.1);
+}
+
+/* Global Loading States */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 20px;
+}
+
+.loading::before {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(78, 205, 196, 0.3);
+  border-top: 4px solid #4ecdc4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Global Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0.8rem 1rem;
+  }
+  
+  .app-header h1 {
+    font-size: 1.6rem;
+  }
+  
+  .app-main {
+    padding: 15px;
+  }
+  
+  .floating-back-button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .app-header h1 {
+    font-size: 1.4rem;
+  }
+  
+  .app-main {
+    padding: 10px;
+  }
+  
+  .floating-back-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+} 

@@ -729,6 +729,7 @@ body {
   text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
 }
 
+/* .back-button {  <-- Commented out to prevent global override */
 .back-button {
   position: absolute;
   top: 20px;
@@ -745,6 +746,8 @@ body {
 .back-button:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* } */
 
 /* Gacha Specific */
 .gacha-area {
@@ -1510,11 +1513,14 @@ body {
     gap: 1rem;
   }
   
+  /* .back-button {  <-- Commented out to prevent global override */
   .back-button {
     position: static;
     margin-bottom: 1rem;
     width: fit-content;
   }
+  
+  /* } */
   
   .gacha-buttons {
     grid-template-columns: 1fr;

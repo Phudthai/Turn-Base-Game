@@ -68,14 +68,15 @@ async function resetDatabase() {
     const userCount = await User.countDocuments();
     const characterCount = await Character.countDocuments();
     const petCount = await Pet.countDocuments();
-    const userCharacterCount = await UserCharacter.countDocuments();
-    const userPetCount = await UserPet.countDocuments();
+    // ไม่แสดง user data count เพราะไม่ได้ seed แล้ว
+    // const userCharacterCount = await UserCharacter.countDocuments();
+    // const userPetCount = await UserPet.countDocuments();
 
     console.log(`   👥 Users: ${userCount}`);
     console.log(`   ⚔️ Character Templates: ${characterCount}`);
     console.log(`   🐾 Pet Templates: ${petCount}`);
-    console.log(`   🎭 User Characters: ${userCharacterCount}`);
-    console.log(`   🐕 User Pets: ${userPetCount}`);
+    // console.log(`   🎭 User Characters: ${userCharacterCount}`);
+    // console.log(`   🐕 User Pets: ${userPetCount}`);
 
     process.exit(0);
   } catch (error) {

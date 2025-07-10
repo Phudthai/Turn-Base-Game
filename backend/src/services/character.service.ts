@@ -266,4 +266,18 @@ export class CharacterService {
       throw error;
     }
   }
+
+  // Add experience to user character (for battle rewards)
+  static async addExperience(
+    userId: string,
+    userCharacterId: string,
+    expGain: number
+  ): Promise<IUserCharacter | null> {
+    try {
+      return await this.levelUpCharacter(userId, userCharacterId, expGain);
+    } catch (error) {
+      console.error("Error adding experience:", error);
+      throw error;
+    }
+  }
 }

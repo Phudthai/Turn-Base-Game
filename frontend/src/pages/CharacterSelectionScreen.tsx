@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { inventoryAPI, authAPI } from "../../services/api";
+import { useAuth } from "../context/AuthContext";
+import { inventoryAPI, authAPI } from "../services/api";
 import "./CharacterSelectionScreen.css";
 
 interface CharacterSelectionScreenProps {
@@ -281,53 +281,6 @@ export function CharacterSelectionScreen({
         </button>
       </div>
 
-      {/* Filters Section */}
-      <div className="filters-section">
-        <div className="filter-group">
-          <label>Rarity:</label>
-          <select
-            value={rarityFilter}
-            onChange={(e) => setRarityFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Rarities</option>
-            <option value="SSR">SSR ⭐⭐⭐</option>
-            <option value="SR">SR ⭐⭐</option>
-            <option value="R">R ⭐</option>
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label>Sort by:</label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="filter-select"
-          >
-            <option value="level">Level</option>
-            <option value="power">Power</option>
-            <option value="name">Name</option>
-            <option value="rarity">Rarity</option>
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label>Order:</label>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="filter-select"
-          >
-            <option value="desc">High to Low</option>
-            <option value="asc">Low to High</option>
-          </select>
-        </div>
-
-        <div className="results-count">
-          {filteredCharacters.length} characters
-        </div>
-      </div>
-
       {/* Selected Team Preview */}
       <div className="selected-team-preview">
         <h3>🛡️ Battle Team</h3>
@@ -371,8 +324,55 @@ export function CharacterSelectionScreen({
           </div>
         ) : (
           <div className="characters-carousel">
-            <div className="characters-scroll">
-              {filteredCharacters.map((character) => {
+            {/* Filters Section - inside carousel but above scroll */}
+            <div className="filters-section">
+              <div className="filter-group">
+                <label>Rarity:</label>
+                <select
+                  value={rarityFilter}
+                  onChange={(e) => setRarityFilter(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="all">All Rarities</option>
+                  <option value="SSR">SSR ⭐⭐⭐</option>
+                  <option value="SR">SR ⭐⭐</option>
+                  <option value="R">R ⭐</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Sort by:</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="level">Level</option>
+                  <option value="power">Power</option>
+                  <option value="name">Name</option>
+                  <option value="rarity">Rarity</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Order:</label>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="desc">High to Low</option>
+                  <option value="asc">Low to High</option>
+                </select>
+              </div>
+
+              <div className="results-count">
+                {filteredCharacters.length} characters
+              </div>
+            </div>
+            {/* Single grid scroll with 2 rows, cards alternate rows */}
+            <div className="characters-scroll-grid">
+              {filteredCharacters.map((character, i) => {
                 const isSelected = selectedCharacters.some(
                   (c) => c.id === character.id
                 );
@@ -385,54 +385,40 @@ export function CharacterSelectionScreen({
                       character.currentStats.defense * 0.2 +
                       character.currentStats.speed * 0.1
                   );
-
                 return (
                   <div
                     key={character.id}
                     className={`character-card-horizontal ${
                       isSelected ? "selected" : ""
                     } ${isLocked ? "locked" : ""}`}
+                    style={{ gridRow: (i % 2) + 1 }}
                     onClick={() => handleCharacterSelect(character)}
                   >
-                    {/* Grade (Rarity) - Top Left */}
                     <div
                       className="character-grade-badge"
                       style={{ color: getRarityColor(character.rarity) }}
                     >
                       {character.rarity}
                     </div>
-
-                    {/* Power Level - Top Right */}
                     <div className="character-power-badge">⚡ {powerLevel}</div>
-
                     {isLocked && <div className="lock-overlay">🔒</div>}
                     {character.isFavorite && (
                       <div className="favorite-badge">❤️</div>
                     )}
-
-                    {/* Character Icon - Large and Prominent */}
                     <div className="character-main-icon">
                       {character.artwork?.icon || "👤"}
                     </div>
-
-                    {/* Character Info */}
                     <div className="character-info-horizontal">
                       <div className="character-name">{character.name}</div>
-
-                      {/* Level - Prominent */}
                       <div className="character-level-large">
                         Lv.{character.level}
                       </div>
-
-                      {/* Rarity with Stars */}
                       <div
                         className="character-rarity-stars"
                         style={{ color: getRarityColor(character.rarity) }}
                       >
                         {getRarityStars(character.rarity)}
                       </div>
-
-                      {/* Quick Stats */}
                       <div className="quick-stats">
                         <div className="stat-item">
                           <span className="stat-icon">❤️</span>
@@ -460,16 +446,6 @@ export function CharacterSelectionScreen({
                         </div>
                       </div>
                     </div>
-
-                    {/* Selection Indicator */}
-                    {isSelected && (
-                      <div className="selection-indicator-horizontal">
-                        <div className="checkmark">✅</div>
-                        <div className="selected-text">SELECTED</div>
-                      </div>
-                    )}
-
-                    {/* Rarity Border */}
                     <div
                       className="rarity-border"
                       style={{

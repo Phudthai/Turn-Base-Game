@@ -83,8 +83,10 @@ export type BattleState = {
   maxTurns: number;
   battleRewards?: BattleRewards;
   finalRewards?: BattleRewards;
-  battleType: "pve" | "pvp" | "boss" | "dungeon";
-  difficulty: "easy" | "normal" | "hard" | "nightmare";
+  battleType?: "pve" | "pvp" | "boss" | "dungeon";
+  difficulty?: "easy" | "normal" | "hard" | "nightmare";
+  selectedEnemy?: string;
+  startTime?: Date;
   environment?: {
     name: string;
     effects: string[];

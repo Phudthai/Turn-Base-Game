@@ -1,5 +1,10 @@
-import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import React from "react";
+import { useAuth } from "../context/AuthContext";
+import "../styles/global.css";
+import "../styles/animations.css";
+import "../styles/components/buttons.css";
+import "../styles/components/forms.css";
+import "./SettingsScreen.css";
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -7,7 +12,7 @@ interface SettingsScreenProps {
 
 export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { user, logout } = useAuth();
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = React.useState({
     soundEnabled: true,
     musicEnabled: true,
     notificationsEnabled: true,

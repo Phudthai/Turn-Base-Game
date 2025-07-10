@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
   GAME: {
     GACHA_PULL: `${API_BASE_URL}/gacha/pull`,
     GACHA_BANNERS: `${API_BASE_URL}/gacha/banners`,
+    GACHA_BANNERS_ACTIVE: `${API_BASE_URL}/gacha/banners/active`,
     BATTLE: `${API_BASE_URL}/battle`,
     INVENTORY: `${API_BASE_URL}/inventory`,
   },

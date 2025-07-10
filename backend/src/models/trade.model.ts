@@ -61,20 +61,18 @@ export interface ITrade extends Document {
 
 const TradeSchema = new Schema<ITrade>(
   {
-    sellerId: { type: String, required: true, index: true },
-    buyerId: { type: String, default: null, index: true },
+    sellerId: { type: String, required: true },
+    buyerId: { type: String, default: null },
     status: {
       type: String,
       enum: ["active", "sold", "cancelled", "expired"],
       required: true,
       default: "active",
-      index: true,
     },
     tradeType: {
       type: String,
       enum: ["sell", "auction", "exchange"],
       required: true,
-      index: true,
     },
     items: [
       {
@@ -149,7 +147,7 @@ const TradeSchema = new Schema<ITrade>(
   }
 );
 
-// Indexes for better performance
+// Indexes for better performance (คงไว้เฉพาะ composite index)
 TradeSchema.index({ sellerId: 1, status: 1 });
 TradeSchema.index({ buyerId: 1, status: 1 });
 TradeSchema.index({ status: 1, tradeType: 1 });
@@ -219,7 +217,7 @@ export interface ITradeEscrow extends Document {
 
 const TradeEscrowSchema = new Schema<ITradeEscrow>(
   {
-    tradeId: { type: String, required: true, unique: true, index: true },
+    tradeId: { type: String, required: true, unique: true },
     sellerId: { type: String, required: true, index: true },
     buyerId: { type: String, required: true, index: true },
     items: [
@@ -275,7 +273,6 @@ const TradeEscrowSchema = new Schema<ITradeEscrow>(
   }
 );
 
-TradeEscrowSchema.index({ tradeId: 1 });
 TradeEscrowSchema.index({ status: 1, createdAt: -1 });
 
 export const TradeEscrow = mongoose.model<ITradeEscrow>(

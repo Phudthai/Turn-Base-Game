@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { inventoryAPI } from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import { inventoryAPI } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 interface ItemDetail {
   id: string;
@@ -821,4 +821,3 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
 };
 
 export default InventoryModal;
- 

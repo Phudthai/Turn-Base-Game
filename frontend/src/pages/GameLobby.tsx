@@ -1,8 +1,26 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useAuth } from "../../context/AuthContext";
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import "../styles/global.css";
+import "../styles/animations.css";
+import "../styles/components/buttons.css";
+import "./GameLobby.css";
+
+type GameState =
+  | "lobby"
+  | "gacha"
+  | "inventory"
+  | "battle"
+  | "settings"
+  | "campaign"
+  | "arena"
+  | "market"
+  | "guild"
+  | "dungeon"
+  | "achievements"
+  | "statistics";
 
 interface GameLobbyProps {
-  onNavigate: (screen: string) => void;
+  onNavigate: (screen: GameState) => void;
 }
 
 interface Position {
@@ -61,7 +79,7 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
       size: { width: 140, height: 120 },
       icon: "⚔️",
       description: "Battle against other players",
-      unlocked: user?.level && user.level >= 3,
+      unlocked: !!user?.level && user.level >= 3,
     },
     {
       id: "market",
@@ -79,7 +97,7 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
       size: { width: 130, height: 110 },
       icon: "🏰",
       description: "Join a guild and socialize",
-      unlocked: user?.level && user.level >= 5,
+      unlocked: !!user?.level && user.level >= 5,
     },
     {
       id: "dungeon",
@@ -88,7 +106,7 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
       size: { width: 120, height: 130 },
       icon: "🏔️",
       description: "Explore dangerous dungeons",
-      unlocked: user?.level && user.level >= 10,
+      unlocked: !!user?.level && user.level >= 10,
     },
   ];
 
@@ -178,7 +196,7 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
 
     // Navigate to the selected area
     setTimeout(() => {
-      onNavigate(areaId);
+      onNavigate(areaId as GameState);
       setSelectedArea(null);
     }, 300);
   };
@@ -224,24 +242,22 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
 
       {/* User Profile Card - Separate from Navbar */}
       <div className="user-profile-card">
-        <div className="user-info">
-          <div className="user-avatar">
+        <div className="profile-row">
+          <div className="profile-avatar">
             <span className="avatar-icon">👤</span>
-            <div className="user-level">{user?.level || 1}</div>
+            <div className="avatar-level">{user?.level || 1}</div>
+            {/* notification badge, if any, can be added here */}
           </div>
-          <div className="user-details">
-            <h3 className="username">{user?.username}</h3>
-            <div className="exp-bar">
-              <div
-                className="exp-fill"
-                style={{
-                  width: `${Math.max(8, (user?.experience || 0) % 100)}%`,
-                }}
-              ></div>
-              <span className="exp-text">
-                {(user?.experience || 0) % 100}/100 EXP
-              </span>
-            </div>
+          <div className="profile-username">{user?.username}</div>
+        </div>
+        <div className="exp-bar-container">
+          <div className="exp-bar">
+            <div
+              className="exp-fill"
+              style={{
+                width: `${Math.max(8, (user?.experience || 0) % 100)}%`,
+              }}
+            />
           </div>
         </div>
       </div>
@@ -436,6 +452,18 @@ export function GameLobby({ onNavigate }: GameLobbyProps) {
         </button>
         <button className="menu-button" onClick={() => onNavigate("battle")}>
           ⚔️
+        </button>
+        <button
+          className="menu-button"
+          onClick={() => onNavigate("achievements")}
+        >
+          🏆
+        </button>
+        <button
+          className="menu-button"
+          onClick={() => onNavigate("statistics")}
+        >
+          📊
         </button>
         <button className="menu-button" onClick={() => onNavigate("settings")}>
           ⚙️

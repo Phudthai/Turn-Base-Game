@@ -83,7 +83,7 @@ export const useGameAPI = () => {
     setIsLoading(true);
     setError(null);
     try {
-      return await gameAPI.getBanners(token || undefined);
+      return await gameAPI.getBannersActive(token || undefined);
     } catch (err: any) {
       setError(err.message || "Failed to get banners");
       return null;

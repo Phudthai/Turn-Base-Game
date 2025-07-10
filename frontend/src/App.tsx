@@ -3,16 +3,15 @@ import { createRoot } from "react-dom/client";
 import "../styles.css";
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { LoginScreen } from "./components/screens/LoginScreen";
-import {
-  DashboardScreen,
-  type GameState,
-} from "./components/screens/DashboardScreen";
-import { GachaScreen } from "./components/screens/GachaScreen";
-import { BattleScreen } from "./components/screens/BattleScreen";
-import { InventoryScreen } from "./components/screens/InventoryScreen";
-import { GameLobby } from "./components/screens/GameLobby";
-import { SettingsScreen } from "./components/screens/SettingsScreen";
+import { LoginScreen } from "./pages/LoginScreen";
+import { DashboardScreen, type GameState } from "./pages/DashboardScreen";
+import { GachaScreen } from "./pages/GachaScreen";
+import { BattleScreen } from "./pages/BattleScreen";
+import { InventoryScreen } from "./pages/InventoryScreen";
+import { GameLobby } from "./pages/GameLobby";
+import { SettingsScreen } from "./pages/SettingsScreen";
+import { AchievementScreen } from "./pages/AchievementScreen";
+import { StatisticsScreen } from "./pages/StatisticsScreen";
 
 // Loading component
 function LoadingScreen() {
@@ -82,6 +81,10 @@ function AppContent() {
         return <InventoryScreen onBack={() => setGameState("lobby")} />;
       case "settings":
         return <SettingsScreen onBack={() => setGameState("lobby")} />;
+      case "achievements":
+        return <AchievementScreen onBack={() => setGameState("lobby")} />;
+      case "statistics":
+        return <StatisticsScreen onBack={() => setGameState("lobby")} />;
       case "shop":
         return <DashboardScreen onNavigate={setGameState} />;
       case "guild":

@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
+import "../styles/global.css";
+import "../styles/animations.css";
+import "../styles/components/forms.css";
+import "../styles/components/buttons.css";
+import "./LoginScreen.css";
 
 export function LoginScreen() {
   const [username, setUsername] = useState("");

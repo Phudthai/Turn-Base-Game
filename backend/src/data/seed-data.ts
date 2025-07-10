@@ -16,7 +16,7 @@ export const seedCharacters = async () => {
     }
 
     const characters = [
-      // SSR Characters
+      // SSR Characters - Legendary Heroes
       {
         id: "char_ssr_001",
         name: "Dragon Knight Aria",
@@ -40,10 +40,17 @@ export const seedCharacters = async () => {
         skills: [
           {
             id: "skill_001",
-            name: "Dragon Slash",
-            description: "Powerful fire attack",
+            name: "🔥 Dragon Flame",
+            description: "Massive fire attack that burns enemies",
             cooldown: 3,
             manaCost: 30,
+          },
+          {
+            id: "skill_001b",
+            name: "🛡️ Dragon Scale",
+            description: "Increases defense dramatically",
+            cooldown: 4,
+            manaCost: 25,
           },
         ],
         maxLevel: 80,
@@ -64,7 +71,7 @@ export const seedCharacters = async () => {
           hp: 800,
           attack: 220,
           defense: 80,
-          speed: 110,
+          speed: 130,
           critRate: 20,
           critDamage: 250,
         },
@@ -77,10 +84,17 @@ export const seedCharacters = async () => {
         skills: [
           {
             id: "skill_002",
-            name: "Storm Bolt",
-            description: "Lightning magic attack",
+            name: "⚡ Storm Bolt",
+            description: "Lightning magic that chains between enemies",
             cooldown: 2,
             manaCost: 40,
+          },
+          {
+            id: "skill_002b",
+            name: "🌪️ Tornado",
+            description: "Hits all enemies with wind magic",
+            cooldown: 5,
+            manaCost: 50,
           },
         ],
         maxLevel: 80,
@@ -91,8 +105,140 @@ export const seedCharacters = async () => {
         },
         lore: "Master of wind and lightning magic",
       },
+      {
+        id: "char_ssr_003",
+        name: "Shadow Assassin Kage",
+        rarity: "SSR" as const,
+        element: "dark" as const,
+        characterType: "assassin" as const,
+        baseStats: {
+          hp: 950,
+          attack: 200,
+          defense: 90,
+          speed: 150,
+          critRate: 35,
+          critDamage: 300,
+        },
+        growthRates: {
+          hp: 20,
+          attack: 4.5,
+          defense: 2,
+          speed: 4,
+        },
+        skills: [
+          {
+            id: "skill_003",
+            name: "🗡️ Shadow Strike",
+            description: "Critical hit that ignores defense",
+            cooldown: 2,
+            manaCost: 35,
+          },
+          {
+            id: "skill_003b",
+            name: "👤 Shadow Clone",
+            description: "Creates shadow copies for extra attacks",
+            cooldown: 6,
+            manaCost: 45,
+          },
+        ],
+        maxLevel: 80,
+        artwork: {
+          icon: "🥷",
+          portrait: "🥷",
+          fullArt: "🥷",
+        },
+        lore: "Master assassin who controls shadows",
+      },
+      {
+        id: "char_ssr_004",
+        name: "Divine Oracle Luna",
+        rarity: "SSR" as const,
+        element: "light" as const,
+        characterType: "healer" as const,
+        baseStats: {
+          hp: 1100,
+          attack: 140,
+          defense: 110,
+          speed: 100,
+          critRate: 12,
+          critDamage: 150,
+        },
+        growthRates: {
+          hp: 24,
+          attack: 3,
+          defense: 3.5,
+          speed: 2.5,
+        },
+        skills: [
+          {
+            id: "skill_004",
+            name: "✨ Divine Light",
+            description: "Heals all allies and removes debuffs",
+            cooldown: 3,
+            manaCost: 40,
+          },
+          {
+            id: "skill_004b",
+            name: "🛡️ Sacred Barrier",
+            description: "Protects all allies from next attack",
+            cooldown: 5,
+            manaCost: 35,
+          },
+        ],
+        maxLevel: 80,
+        artwork: {
+          icon: "👼",
+          portrait: "👼",
+          fullArt: "👼",
+        },
+        lore: "Blessed oracle with divine powers",
+      },
+      {
+        id: "char_ssr_005",
+        name: "Demon Lord Bael",
+        rarity: "SSR" as const,
+        element: "dark" as const,
+        characterType: "warrior" as const,
+        baseStats: {
+          hp: 1400,
+          attack: 195,
+          defense: 130,
+          speed: 80,
+          critRate: 18,
+          critDamage: 220,
+        },
+        growthRates: {
+          hp: 28,
+          attack: 4.2,
+          defense: 3.8,
+          speed: 1.5,
+        },
+        skills: [
+          {
+            id: "skill_005",
+            name: "💀 Soul Drain",
+            description: "Drains enemy HP and gains power",
+            cooldown: 3,
+            manaCost: 35,
+          },
+          {
+            id: "skill_005b",
+            name: "🔥 Hellfire",
+            description: "Dark fire that burns all enemies",
+            cooldown: 4,
+            manaCost: 45,
+          },
+        ],
+        maxLevel: 80,
+        artwork: {
+          icon: "👹",
+          portrait: "👹",
+          fullArt: "👹",
+        },
+        lore: "Fallen angel who became a demon lord",
+      },
 
-      // SR Characters
+      // SR Characters - Elite Warriors
       {
         id: "char_sr_001",
         name: "Forest Ranger Luna",
@@ -115,11 +261,18 @@ export const seedCharacters = async () => {
         },
         skills: [
           {
-            id: "skill_003",
-            name: "Nature's Arrow",
-            description: "Earth-infused arrow attack",
+            id: "skill_006",
+            name: "🏹 Nature's Arrow",
+            description: "Earth-infused arrow with poison effect",
             cooldown: 2,
             manaCost: 25,
+          },
+          {
+            id: "skill_006b",
+            name: "🌿 Forest Blessing",
+            description: "Heals and increases team speed",
+            cooldown: 4,
+            manaCost: 30,
           },
         ],
         maxLevel: 70,
@@ -132,43 +285,182 @@ export const seedCharacters = async () => {
       },
       {
         id: "char_sr_002",
-        name: "Holy Priest Marcus",
+        name: "Ice Queen Elsa",
         rarity: "SR" as const,
-        element: "light" as const,
-        characterType: "healer" as const,
+        element: "water" as const,
+        characterType: "mage" as const,
         baseStats: {
-          hp: 1000,
-          attack: 100,
-          defense: 110,
-          speed: 80,
-          critRate: 10,
-          critDamage: 150,
+          hp: 850,
+          attack: 170,
+          defense: 85,
+          speed: 110,
+          critRate: 15,
+          critDamage: 160,
         },
         growthRates: {
-          hp: 22,
-          attack: 2.5,
-          defense: 3,
-          speed: 2,
+          hp: 19,
+          attack: 4,
+          defense: 2.5,
+          speed: 3,
         },
         skills: [
           {
-            id: "skill_004",
-            name: "Divine Heal",
-            description: "Restore ally HP",
-            cooldown: 1,
+            id: "skill_007",
+            name: "❄️ Ice Blast",
+            description: "Freezes enemy and deals ice damage",
+            cooldown: 2,
+            manaCost: 28,
+          },
+          {
+            id: "skill_007b",
+            name: "🧊 Blizzard",
+            description: "Area ice attack that slows all enemies",
+            cooldown: 4,
+            manaCost: 40,
+          },
+        ],
+        maxLevel: 70,
+        artwork: {
+          icon: "❄️",
+          portrait: "❄️",
+          fullArt: "❄️",
+        },
+        lore: "Queen who commands ice and snow",
+      },
+      {
+        id: "char_sr_003",
+        name: "Thunder Berserker Ragnar",
+        rarity: "SR" as const,
+        element: "air" as const,
+        characterType: "warrior" as const,
+        baseStats: {
+          hp: 1000,
+          attack: 165,
+          defense: 95,
+          speed: 105,
+          critRate: 20,
+          critDamage: 175,
+        },
+        growthRates: {
+          hp: 22,
+          attack: 3.8,
+          defense: 2.8,
+          speed: 2.5,
+        },
+        skills: [
+          {
+            id: "skill_008",
+            name: "⚡ Thunder Punch",
+            description: "Electric attack that may stun",
+            cooldown: 2,
+            manaCost: 24,
+          },
+          {
+            id: "skill_008b",
+            name: "💥 Berserker Rage",
+            description: "Increases attack but lowers defense",
+            cooldown: 5,
             manaCost: 20,
           },
         ],
         maxLevel: 70,
         artwork: {
-          icon: "✨",
-          portrait: "✨",
-          fullArt: "✨",
+          icon: "⚡",
+          portrait: "⚡",
+          fullArt: "⚡",
         },
-        lore: "Devoted servant of the light",
+        lore: "Viking warrior blessed by thunder gods",
+      },
+      {
+        id: "char_sr_004",
+        name: "Phoenix Summoner Pyra",
+        rarity: "SR" as const,
+        element: "fire" as const,
+        characterType: "summoner" as const,
+        baseStats: {
+          hp: 880,
+          attack: 160,
+          defense: 80,
+          speed: 115,
+          critRate: 18,
+          critDamage: 165,
+        },
+        growthRates: {
+          hp: 20,
+          attack: 3.8,
+          defense: 2.2,
+          speed: 3.2,
+        },
+        skills: [
+          {
+            id: "skill_009",
+            name: "🔥 Phoenix Fire",
+            description: "Fire attack that may revive fallen allies",
+            cooldown: 3,
+            manaCost: 35,
+          },
+          {
+            id: "skill_009b",
+            name: "🦅 Phoenix Shield",
+            description: "Fire barrier that reflects damage",
+            cooldown: 4,
+            manaCost: 30,
+          },
+        ],
+        maxLevel: 70,
+        artwork: {
+          icon: "🔥",
+          portrait: "🔥",
+          fullArt: "🔥",
+        },
+        lore: "Summoner who commands the phoenix",
+      },
+      {
+        id: "char_sr_005",
+        name: "Stone Guardian Titan",
+        rarity: "SR" as const,
+        element: "earth" as const,
+        characterType: "tank" as const,
+        baseStats: {
+          hp: 1300,
+          attack: 120,
+          defense: 180,
+          speed: 60,
+          critRate: 8,
+          critDamage: 130,
+        },
+        growthRates: {
+          hp: 26,
+          attack: 2.8,
+          defense: 4.5,
+          speed: 1,
+        },
+        skills: [
+          {
+            id: "skill_010",
+            name: "🗿 Rock Smash",
+            description: "Heavy attack that reduces enemy defense",
+            cooldown: 3,
+            manaCost: 25,
+          },
+          {
+            id: "skill_010b",
+            name: "🛡️ Stone Wall",
+            description: "Protects all allies and reflects damage",
+            cooldown: 5,
+            manaCost: 35,
+          },
+        ],
+        maxLevel: 70,
+        artwork: {
+          icon: "🗿",
+          portrait: "🗿",
+          fullArt: "🗿",
+        },
+        lore: "Ancient guardian made of living stone",
       },
 
-      // R Characters
+      // R Characters - Common Heroes
       {
         id: "char_r_001",
         name: "Rookie Swordsman",
@@ -191,8 +483,8 @@ export const seedCharacters = async () => {
         },
         skills: [
           {
-            id: "skill_005",
-            name: "Basic Slash",
+            id: "skill_011",
+            name: "⚔️ Basic Slash",
             description: "Simple sword attack",
             cooldown: 1,
             manaCost: 10,
@@ -228,8 +520,8 @@ export const seedCharacters = async () => {
         },
         skills: [
           {
-            id: "skill_006",
-            name: "Water Splash",
+            id: "skill_012",
+            name: "💧 Water Splash",
             description: "Basic water magic",
             cooldown: 1,
             manaCost: 15,
@@ -242,6 +534,154 @@ export const seedCharacters = async () => {
           fullArt: "💧",
         },
         lore: "A village mage learning the arts",
+      },
+      {
+        id: "char_r_003",
+        name: "Fire Sprite",
+        rarity: "R" as const,
+        element: "fire" as const,
+        characterType: "mage" as const,
+        baseStats: {
+          hp: 420,
+          attack: 95,
+          defense: 35,
+          speed: 90,
+          critRate: 12,
+          critDamage: 140,
+        },
+        growthRates: {
+          hp: 11,
+          attack: 2.8,
+          defense: 1.2,
+          speed: 2.5,
+        },
+        skills: [
+          {
+            id: "skill_013",
+            name: "🔥 Fire Ball",
+            description: "Basic fire spell",
+            cooldown: 2,
+            manaCost: 18,
+          },
+        ],
+        maxLevel: 50,
+        artwork: {
+          icon: "🔥",
+          portrait: "🔥",
+          fullArt: "🔥",
+        },
+        lore: "Playful fire spirit",
+      },
+      {
+        id: "char_r_004",
+        name: "Wind Scout",
+        rarity: "R" as const,
+        element: "air" as const,
+        characterType: "archer" as const,
+        baseStats: {
+          hp: 520,
+          attack: 85,
+          defense: 45,
+          speed: 110,
+          critRate: 15,
+          critDamage: 145,
+        },
+        growthRates: {
+          hp: 13,
+          attack: 2.3,
+          defense: 1.8,
+          speed: 3,
+        },
+        skills: [
+          {
+            id: "skill_014",
+            name: "🏹 Wind Arrow",
+            description: "Fast arrow attack",
+            cooldown: 1,
+            manaCost: 12,
+          },
+        ],
+        maxLevel: 50,
+        artwork: {
+          icon: "🏹",
+          portrait: "🏹",
+          fullArt: "🏹",
+        },
+        lore: "Swift scout with wind magic",
+      },
+      {
+        id: "char_r_005",
+        name: "Earth Golem",
+        rarity: "R" as const,
+        element: "earth" as const,
+        characterType: "tank" as const,
+        baseStats: {
+          hp: 750,
+          attack: 65,
+          defense: 95,
+          speed: 45,
+          critRate: 3,
+          critDamage: 110,
+        },
+        growthRates: {
+          hp: 18,
+          attack: 1.5,
+          defense: 3,
+          speed: 0.8,
+        },
+        skills: [
+          {
+            id: "skill_015",
+            name: "👊 Rock Punch",
+            description: "Heavy earth attack",
+            cooldown: 2,
+            manaCost: 15,
+          },
+        ],
+        maxLevel: 50,
+        artwork: {
+          icon: "🗿",
+          portrait: "🗿",
+          fullArt: "🗿",
+        },
+        lore: "Animated rock creature",
+      },
+      {
+        id: "char_r_006",
+        name: "Light Cleric",
+        rarity: "R" as const,
+        element: "light" as const,
+        characterType: "healer" as const,
+        baseStats: {
+          hp: 580,
+          attack: 70,
+          defense: 55,
+          speed: 75,
+          critRate: 6,
+          critDamage: 115,
+        },
+        growthRates: {
+          hp: 14,
+          attack: 1.8,
+          defense: 2.2,
+          speed: 2,
+        },
+        skills: [
+          {
+            id: "skill_016",
+            name: "✨ Minor Heal",
+            description: "Basic healing spell",
+            cooldown: 2,
+            manaCost: 16,
+          },
+        ],
+        maxLevel: 50,
+        artwork: {
+          icon: "✨",
+          portrait: "✨",
+          fullArt: "✨",
+        },
+        lore: "Novice healer of the light",
       },
     ];
 
@@ -1015,7 +1455,8 @@ export const seedDatabase = async () => {
   await seedPets();
   await seedItems();
   await seedGachaPool();
-  await seedUserInventory();
-  await seedUserItems();
+  // ไม่ seed user data
+  // await seedUserInventory();
+  // await seedUserItems();
   console.log("🌱 Database seeding completed!");
 };

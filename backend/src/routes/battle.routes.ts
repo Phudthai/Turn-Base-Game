@@ -5,6 +5,15 @@ import { authMiddleware } from "../middleware/auth.middleware";
 console.log("Setting up enhanced battle routes");
 
 export const battleRoutes = new Elysia({ prefix: "/battle" })
+  // Public routes (no auth required)
+  .get("/enemies", async () => {
+    return BattleController.getAvailableEnemies();
+  })
+  .get("/difficulties", async () => {
+    return BattleController.getDifficultySettings();
+  })
+
+  // Protected routes (auth required)
   .use(authMiddleware)
   .post(
     "/start",
@@ -30,6 +39,7 @@ export const battleRoutes = new Elysia({ prefix: "/battle" })
             t.Literal("dungeon"),
           ])
         ),
+        selectedEnemy: t.Optional(t.String()),
       }),
     }
   )
@@ -93,6 +103,33 @@ export const battleRoutes = new Elysia({ prefix: "/battle" })
     "/:battleId/statistics",
     async ({ params }) => {
       return BattleController.getBattleStatistics({ params });
+    },
+    {
+      params: t.Object({
+        battleId: t.String(),
+      }),
+    }
+  )
+
+  // New: Get user's battle sessions
+  .get(
+    "/sessions",
+    async ({ user, query }) => {
+      return BattleController.getUserBattleSessions({ user, query });
+    },
+    {
+      query: t.Object({
+        status: t.Optional(t.String()),
+        limit: t.Optional(t.String()),
+      }),
+    }
+  )
+
+  // New: Abandon a battle
+  .post(
+    "/:battleId/abandon",
+    async ({ params, user }) => {
+      return BattleController.abandonBattle({ params, user });
     },
     {
       params: t.Object({

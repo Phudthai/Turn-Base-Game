@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { useGameAPI } from "../../hooks/useGameAPI";
-import type { InventoryResponse } from "../../types/types";
-import InventoryModal from "../InventoryModal";
+import { useAuth } from "../context/AuthContext";
+import { useGameAPI } from "../hooks/useGameAPI";
+import type { InventoryResponse } from "../types/types";
+import InventoryModal from "../components/common/InventoryModal";
 
 interface InventoryScreenProps {
   onBack: () => void;

@@ -1,0 +1,401 @@
+/* FORM COMPONENT STYLES */
+
+/* Input Groups */
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  font-size: 1.2rem;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s ease;
+}
+
+/* Input Fields */
+.login-input, .form-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.login-input:focus, .form-input:focus {
+  outline: none;
+  border-color: #4ecdc4;
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.login-input:focus + .input-icon, .form-input:focus + .input-icon {
+  color: #4ecdc4;
+}
+
+.login-input::placeholder, .form-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.login-input:disabled, .form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Select Fields */
+.form-select, .filter-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-select:hover, .filter-select:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.form-select:focus, .filter-select:focus {
+  outline: none;
+  border-color: #4ecdc4;
+  box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2);
+}
+
+.form-select option, .filter-select option {
+  background: #1a1a2e;
+  color: white;
+}
+
+/* Settings Specific */
+.setting-item {
+  margin-bottom: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.setting-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.setting-item label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1rem;
+  color: white;
+  margin: 0;
+}
+
+.setting-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #4ecdc4;
+  cursor: pointer;
+}
+
+.setting-item select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  padding: 8px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.setting-item select:focus {
+  outline: none;
+  border-color: #4ecdc4;
+  box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+}
+
+.setting-item select option {
+  background: #1a1a1a;
+  color: white;
+}
+
+/* Range Inputs */
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.range-inputs input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: white;
+  font-size: 0.9rem;
+  width: 80px;
+  text-align: center;
+}
+
+.range-inputs input:focus {
+  outline: none;
+  border-color: #4ecdc4;
+  box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+}
+
+.range-inputs span {
+  color: #b8c5d6;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Filter Groups */
+.filter-group {
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.filter-group:last-child {
+  margin-bottom: 0;
+}
+
+.filter-group label {
+  display: block;
+  color: #b8c5d6;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+/* Character Selection Filters */
+.filters-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-size: 0.9rem;
+  color: #b0b0b0;
+  font-weight: 500;
+  margin: 0;
+}
+
+.filter-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-select:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.filter-select option {
+  background: #1a1a2e;
+  color: white;
+}
+
+/* Form Validation */
+.form-error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-success {
+  color: #2ecc71;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Form Labels */
+.form-label {
+  display: block;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: #e74c3c;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-section h3 {
+  color: #4ecdc4;
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Checkbox & Radio Styles */
+.checkbox-group, .radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.checkbox-item, .radio-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+}
+
+.checkbox-item input[type="checkbox"],
+.radio-item input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4ecdc4;
+  cursor: pointer;
+}
+
+.checkbox-item label,
+.radio-item label {
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .login-input, .form-input {
+    padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .filters-section {
+    padding: 0.8rem 1rem;
+    gap: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    justify-content: space-between;
+  }
+  
+  .range-inputs {
+    flex-wrap: wrap;
+  }
+  
+  .range-inputs input {
+    width: 70px;
+  }
+  
+  .form-section {
+    padding: 1rem;
+  }
+  
+  .setting-item label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .setting-item input[type="checkbox"],
+  .setting-item select {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-input, .form-input {
+    padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+    font-size: 16px;
+  }
+  
+  .input-icon {
+    font-size: 1.1rem;
+    left: 0.8rem;
+  }
+  
+  .filters-section {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .filter-select {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .range-inputs input {
+    width: 60px;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .form-section {
+    padding: 0.8rem;
+  }
+  
+  .checkbox-item, .radio-item {
+    gap: 0.6rem;
+  }
+  
+  .checkbox-item input[type="checkbox"],
+  .radio-item input[type="radio"] {
+    width: 16px;
+    height: 16px;
+  }
+} 

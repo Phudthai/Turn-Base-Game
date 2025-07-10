@@ -5,6 +5,8 @@ import {
   battleRoutes,
   inventoryRoutes,
   dataRoutes,
+  achievementRoutes,
+  statisticsRoutes,
 } from "../routes";
 
 export const configureRoutes = (app: Elysia) => {
@@ -21,6 +23,8 @@ export const configureRoutes = (app: Elysia) => {
         .use(gachaRoutes)
         .use(battleRoutes)
         .use(inventoryRoutes)
-        .use(dataRoutes);
+        .use(dataRoutes)
+        .use(achievementRoutes)
+        .use(statisticsRoutes);
     });
 };
